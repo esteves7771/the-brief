@@ -38,6 +38,24 @@ const RSS_SOURCES = {
   motos:    ["https://www.motorcycledaily.com/feed","https://www.rideapart.com/rss/articles/all","https://www.webbikeworld.com/feed"],
 };
 
+// ─── YOUTUBE SOURCES ──────────────────────────────────────────────────────────
+const YT = id => id;
+const YOUTUBE_SOURCES = {
+  // Live tab — major TV news channels only
+  live:     [YT("UCnUYZLuoy1rq1aVMwx4aTzw"),YT("UCNye-wNBqNL5ZzHSJj3l8Bg"),YT("UCknLrEdhRCp1aegoMqRaCZg"),YT("UCBi2mrWuNuyYy4gbM6vU7mQ"),YT("UCupvZG-5ko_eiXAupbDfxWw")],
+  // Category mixes — dedicated professional channels only
+  top:      [YT("UCnUYZLuoy1rq1aVMwx4aTzw"),YT("UCNye-wNBqNL5ZzHSJj3l8Bg")],
+  world:    [YT("UCNye-wNBqNL5ZzHSJj3l8Bg"),YT("UCknLrEdhRCp1aegoMqRaCZg")],
+  tech:     [YT("UCBJycsmduvYEL83R_U4JriQ"),YT("UCXuqSBlHAE6Xw-yeJA0Tunw")],
+  business: [YT("UCrGyqELkKkXKggRphOTv0Tg"),YT("UCvJJ_dzjViJCoLf5uKUTwoA")],
+  science:  [YT("UCZYTClx2T1of7BRZ86-8fow"),YT("UC7DdEm33SyaTDtWYGO2CwdA")],
+  sports:   [YT("UCqZQlzSHbVJrwrn5XvzrzcA"),YT("UC1QLLgrGrpTqpad0zJB4Tsg")],
+  // Cars — Top Gear (verified), Carwow (verified), Throttle House, Car Throttle
+  cars:     [YT("UCjOl2AUblVmg2rA_cRgZkFg"),YT("UCUhFaUpnq31m6TNX2VKVSVA"),YT("UCP3zorCFfVFSGIPUFJziFqA"),YT("UCtze5KM-rMmzBP0HlMN0iKw")],
+  // Motorcycles — MCN, RideApart, Visordown, BikeSocial (all pro moto journalism channels)
+  motos:    [YT("UCB_cdRhIDhlavY2I5URSC7g"),YT("UCMkMkYwBjSxAaxEBdQBxl5Q"),YT("UCpfBFKpvBpbv7OEzCi8YVWQ"),YT("UC_CjHSEYBFGcuL9Sj-AhVIg")],
+};
+
 const CATEGORIES = [
   { id:"top",      label:"Top",         icon:"◈" },
   { id:"world",    label:"World",       icon:"◎" },
@@ -47,10 +65,11 @@ const CATEGORIES = [
   { id:"sports",   label:"Sports",      icon:"◉" },
   { id:"cars",     label:"Cars",        icon:"▷" },
   { id:"motos",    label:"Motorcycles", icon:"◍" },
+  { id:"live",     label:"Live Video",  icon:"▶" },
   { id:"saved",    label:"Saved",       icon:"◆" },
 ];
 
-const RSS2JSON    = "https://api.rss2json.com/v1/api.json?rss_url=";
+const RSS2JSON     = "https://api.rss2json.com/v1/api.json?rss_url=";
 const CONTACT_EMAIL = "pedro.esteves.pt@proton.me";
 
 // ─── WEATHER CODES ────────────────────────────────────────────────────────────
@@ -79,6 +98,26 @@ async function fetchFeed(url) {
       image:       item.thumbnail || item.enclosure?.link || extractImage(item.description) || null,
       source:      data.feed?.title || new URL(url).hostname.replace("www.",""),
       publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+      type:        "article",
+    }));
+  } catch { return []; }
+}
+
+async function fetchYouTubeFeed(channelId) {
+  try {
+    const res = await fetch(`/.netlify/functions/youtube?channelId=${channelId}&count=6`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.items || []).map(item => ({
+      id:          `yt-${item.videoId}`,
+      title:       item.title || "",
+      description: item.description || "",
+      url:         item.url || `https://www.youtube.com/watch?v=${item.videoId}`,
+      image:       item.thumbnail || `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`,
+      source:      item.channelName || "YouTube",
+      publishedAt: item.publishedAt ? new Date(item.publishedAt) : new Date(),
+      type:        "video",
+      videoId:     item.videoId,
     }));
   } catch { return []; }
 }
@@ -133,7 +172,6 @@ function useWeather() {
           const code = data.current?.weathercode ?? 0;
           const temp = Math.round(data.current?.temperature_2m ?? 0);
           const wx   = WX[code] || { icon:"🌡", label:"" };
-          // Reverse geocode city name using open-meteo's timezone string
           const tz   = data.timezone || "";
           const city = tz.split("/").pop()?.replace(/_/g," ") || "";
           setWeather({ temp, icon: wx.icon, label: wx.label, city });
@@ -163,54 +201,122 @@ function SkeletonCard({ featured, th }) {
   );
 }
 
-// ─── WEATHER WIDGET ───────────────────────────────────────────────────────────
-function WeatherWidget({ weather, th }) {
-  if (!weather) return null;
+// ─── VIDEO PLAYER MODAL ───────────────────────────────────────────────────────
+function VideoPlayer({ video, onClose, th }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    const fn = e => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", fn);
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", fn); };
+  }, [onClose]);
+
   return (
-    <div style={{
-      display:"flex", alignItems:"center", gap:"0.5rem",
-      background:th.accentBg, border:`1px solid ${th.accentBord}`,
-      borderRadius:20, padding:"0.25rem 0.75rem",
-      flexShrink:0, animation:"fadeIn 0.4s ease",
-    }}>
-      <span style={{ fontSize:"0.9rem", lineHeight:1 }}>{weather.icon}</span>
-      <span style={{ color:th.accent, fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
-        {weather.temp}°C {weather.city && <span style={{ opacity:0.7 }}>· {weather.city}</span>}
-      </span>
-    </div>
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", backdropFilter:"blur(8px)", zIndex:200, animation:"fadeIn 0.2s ease" }} />
+      <div style={{
+        position:"fixed", top:"50%", left:"50%",
+        transform:"translate(-50%,-50%)",
+        width:"min(900px,96vw)",
+        zIndex:201,
+        display:"flex", flexDirection:"column",
+        animation:"popIn 0.3s cubic-bezier(0.16,1,0.3,1)",
+      }}>
+        {/* top bar */}
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0.75rem 0", marginBottom:"0.5rem" }}>
+          <div style={{ flex:1, minWidth:0 }}>
+            <p style={{ color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", marginBottom:"0.25rem" }}>{video.source}</p>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.1rem)", fontWeight:700, color:"#f8fafc", lineHeight:1.3, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{video.title}</h2>
+          </div>
+          <div style={{ display:"flex", gap:"0.5rem", marginLeft:"1rem", flexShrink:0 }}>
+            <a href={video.url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", padding:"5px 10px", borderRadius:4, textDecoration:"none" }}>YT ↗</a>
+            <button onClick={onClose} style={{ background:"rgba(255,255,255,0.1)", border:"none", color:"#fff", cursor:"pointer", fontSize:"0.9rem", padding:"5px 10px", borderRadius:4 }}>✕</button>
+          </div>
+        </div>
+
+        {/* video embed */}
+        <div style={{ position:"relative", paddingBottom:"56.25%", borderRadius:8, overflow:"hidden", background:"#000" }}>
+          <iframe
+            src={`https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`}
+            title={video.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", border:"none" }}
+          />
+        </div>
+      </div>
+    </>
   );
 }
 
-// ─── BREAKING NEWS BANNER ─────────────────────────────────────────────────────
-function BreakingBanner({ article, onClick, th }) {
-  const [visible, setVisible] = useState(true);
-  if (!article || !visible) return null;
+// ─── VIDEO CARD ───────────────────────────────────────────────────────────────
+function VideoCard({ video, index, onClick, th }) {
+  const [hovered, setHovered] = useState(false);
+  const [imgErr,  setImgErr]  = useState(false);
+
   return (
-    <div style={{
-      background:`linear-gradient(90deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06))`,
-      borderBottom:`1px solid rgba(239,68,68,0.25)`,
-      padding:"0.55rem 1rem",
-      display:"flex", alignItems:"center", gap:"0.75rem",
-      animation:"slideDown 0.4s ease",
-      cursor:"pointer",
-    }}
-    onClick={() => onClick(article)}
+    <article
+      onClick={() => onClick(video)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background:    hovered ? th.bgCardHover : th.bgCard,
+        border:        `1px solid ${hovered ? th.borderHover : th.border}`,
+        borderRadius:  6,
+        cursor:        "pointer",
+        transition:    "all 0.22s ease",
+        transform:     hovered ? "translateY(-2px)" : "none",
+        boxShadow:     hovered ? th.shadow : "none",
+        animation:     `fadeUp 0.45s ease ${index*0.055}s both`,
+        display:       "flex", flexDirection:"column",
+        overflow:      "hidden",
+      }}
     >
-      {/* Pulse dot */}
-      <div style={{ position:"relative", flexShrink:0 }}>
-        <div style={{ width:8, height:8, borderRadius:"50%", background:"#ef4444" }} />
-        <div style={{ position:"absolute", inset:"-3px", borderRadius:"50%", border:"1px solid rgba(239,68,68,0.4)", animation:"ping 1.5s ease-in-out infinite" }} />
+      {/* thumbnail */}
+      <div style={{ position:"relative", paddingBottom:"56.25%", background:th.bgSkeleton1, flexShrink:0 }}>
+        {video.image && !imgErr && (
+          <img
+            src={video.image}
+            alt=""
+            loading="lazy"
+            onError={() => setImgErr(true)}
+            style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+          />
+        )}
+        {/* play button overlay */}
+        <div style={{
+          position:"absolute", inset:0,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          background: hovered ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.2)",
+          transition:"background 0.2s",
+        }}>
+          <div style={{
+            width:44, height:44, borderRadius:"50%",
+            background: hovered ? th.accent : "rgba(255,255,255,0.9)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:"1.1rem", transition:"all 0.2s",
+            transform: hovered ? "scale(1.1)" : "scale(1)",
+          }}>▶</div>
+        </div>
+        {/* YouTube badge */}
+        <div style={{ position:"absolute", bottom:8, right:8, background:"rgba(0,0,0,0.7)", borderRadius:3, padding:"2px 6px" }}>
+          <span style={{ color:"#fff", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em" }}>▶ VIDEO</span>
+        </div>
       </div>
-      <span style={{ color:"#ef4444", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.16em", textTransform:"uppercase", flexShrink:0 }}>Breaking</span>
-      <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Playfair Display',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>
-        {article.title}
-      </p>
-      <span style={{ color:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", flexShrink:0 }}>{timeAgo(article.publishedAt)}</span>
-      <button
-        onClick={e => { e.stopPropagation(); setVisible(false); }}
-        style={{ background:"transparent", border:"none", color:"rgba(239,68,68,0.5)", cursor:"pointer", fontSize:"0.75rem", padding:"0 4px", flexShrink:0 }}
-      >✕</button>
-    </div>
+
+      {/* info */}
+      <div style={{ padding:"0.9rem 1rem", display:"flex", flexDirection:"column", gap:"0.4rem", flex:1 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span style={{ color:th.accent, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", background:th.accentBg, border:`1px solid ${th.accentBord}`, padding:"2px 6px", borderRadius:3 }}>
+            📺 {video.source}
+          </span>
+          <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace" }}>{timeAgo(video.publishedAt)}</span>
+        </div>
+        <h3 style={{ fontFamily:"'Playfair Display',Georgia,serif", fontSize:"0.9rem", fontWeight:600, color:th.textHead, lineHeight:1.3, margin:0, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{video.title}</h3>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.35rem", color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s", marginTop:"auto" }}>
+          WATCH VIDEO →
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -251,8 +357,6 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
       }}
     >
       {featured && <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:`linear-gradient(90deg,${th.accent},#e8833a)` }} />}
-
-      {/* meta row */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:"0.5rem" }}>
         <div style={{ display:"flex", gap:"0.45rem", alignItems:"center", flexWrap:"wrap" }}>
           {featured && <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", letterSpacing:"0.14em", padding:"2px 7px", fontFamily:"'DM Mono',monospace", textTransform:"uppercase" }}>◈ FEATURED</span>}
@@ -260,40 +364,22 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
         </div>
         <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", whiteSpace:"nowrap" }}>{timeAgo(article.publishedAt)}</span>
       </div>
-
-      {/* featured image */}
       {featured && article.image && !imgErr && (
         <div style={{ height:200, borderRadius:4, overflow:"hidden", background:th.bgSkeleton1, flexShrink:0 }}>
           <img src={article.image} alt="" loading="lazy" decoding="async" onError={() => setImgErr(true)} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
         </div>
       )}
-
-      {/* headline */}
       <h2 style={{ fontFamily:"'Playfair Display',Georgia,serif", fontSize:featured?"clamp(1.05rem,2.2vw,1.45rem)":"clamp(0.88rem,1.8vw,0.96rem)", fontWeight:featured?700:600, color:th.textHead, lineHeight:1.3, margin:0, letterSpacing:"-0.01em" }}>{article.title}</h2>
-
-      {/* description */}
       {article.description && (
         <p style={{ color:th.textBody, fontSize:featured?"0.85rem":"0.76rem", lineHeight:1.7, fontFamily:"'Lora',serif", margin:0, display:"-webkit-box", WebkitLineClamp:featured?3:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{article.description}</p>
       )}
-
-      {/* action row */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:"auto" }}>
         <div style={{ display:"flex", alignItems:"center", gap:"0.35rem", color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s" }}>
           READ STORY →
         </div>
         <div style={{ display:"flex", gap:"0.4rem" }}>
-          {/* Share */}
-          <button
-            onClick={handleShare}
-            title="Share article"
-            style={{ background:"transparent", border:`1px solid ${shared?"rgba(74,222,128,0.3)":th.border}`, color:shared?"#4ade80":th.textMuted, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", transition:"all 0.2s", letterSpacing:"0.06em" }}
-          >{shared ? "✓" : "⇪"}</button>
-          {/* Bookmark */}
-          <button
-            onClick={handleBookmark}
-            title={isBookmarked ? "Remove bookmark" : "Save article"}
-            style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.65rem", transition:"all 0.2s" }}
-          >{isBookmarked ? "◆" : "◇"}</button>
+          <button onClick={handleShare} title="Share" style={{ background:"transparent", border:`1px solid ${shared?"rgba(74,222,128,0.3)":th.border}`, color:shared?"#4ade80":th.textMuted, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", transition:"all 0.2s", letterSpacing:"0.06em" }}>{shared ? "✓" : "⇪"}</button>
+          <button onClick={handleBookmark} title={isBookmarked?"Remove":"Save"} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.65rem", transition:"all 0.2s" }}>{isBookmarked ? "◆" : "◇"}</button>
         </div>
       </div>
     </article>
@@ -336,7 +422,6 @@ function InAppBrowser({ url, title, onClose, th }) {
     <>
       <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(8px)", zIndex:200, animation:"fadeIn 0.2s ease" }} />
       <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"min(780px,96vw)", height:"min(90vh,860px)", background:th.bgReader, border:`1px solid ${th.border}`, borderRadius:12, zIndex:201, display:"flex", flexDirection:"column", overflow:"hidden", boxShadow:"0 32px 80px rgba(0,0,0,0.65)", animation:"popIn 0.3s cubic-bezier(0.16,1,0.3,1)" }}>
-        {/* chrome bar */}
         <div style={{ display:"flex", alignItems:"center", gap:"0.6rem", padding:"0.6rem 1rem", background:th.bgHeader, borderBottom:`1px solid ${th.border}`, flexShrink:0, flexWrap:"wrap" }}>
           <div style={{ display:"flex", gap:"0.38rem", flexShrink:0 }}>
             <button onClick={onClose} style={{ width:12, height:12, borderRadius:"50%", background:"#ff5f57", border:"none", cursor:"pointer", padding:0 }} />
@@ -361,7 +446,6 @@ function InAppBrowser({ url, title, onClose, th }) {
             <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
               {[100,85,95,70,90,75].map((w,i) => <div key={i} style={{ height:i===0?28:16, width:`${w}%`, background:`linear-gradient(90deg,${th.bgSkeleton1} 25%,${th.bgSkeleton2} 50%,${th.bgSkeleton1} 75%)`, backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite", borderRadius:3 }} />)}
               <div style={{ height:220, background:`linear-gradient(90deg,${th.bgSkeleton1} 25%,${th.bgSkeleton2} 50%,${th.bgSkeleton1} 75%)`, backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite", borderRadius:6, margin:"0.5rem 0" }} />
-              {[100,88,76,92,65,80].map((w,i) => <div key={i} style={{ height:16, width:`${w}%`, background:`linear-gradient(90deg,${th.bgSkeleton1} 25%,${th.bgSkeleton2} 50%,${th.bgSkeleton1} 75%)`, backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite", borderRadius:3 }} />)}
             </div>
           )}
           {status === "error" && (
@@ -410,17 +494,12 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark }) {
     return () => { window.removeEventListener("keydown", fn); document.body.style.overflow = ""; };
   }, [onClose, showBrowser]);
 
-  const handleShare = () => {
-    shareArticle(article);
-    setShared(true);
-    setTimeout(() => setShared(false), 2000);
-  };
+  const handleShare = () => { shareArticle(article); setShared(true); setTimeout(() => setShared(false), 2000); };
 
   return (
     <>
       <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(5px)", zIndex:100, animation:"fadeIn 0.2s ease" }} />
       <aside style={{ position:"fixed", top:0, right:0, bottom:0, width:"min(680px,100vw)", background:th.bgReader, borderLeft:`1px solid ${th.border}`, zIndex:101, overflowY:"auto", animation:"slideIn 0.3s cubic-bezier(0.16,1,0.3,1)", display:"flex", flexDirection:"column" }}>
-        {/* header */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0.9rem 1.25rem", borderBottom:`1px solid ${th.border}`, position:"sticky", top:0, background:th.bgReader, zIndex:1, gap:"0.75rem", flexWrap:"wrap" }}>
           <div style={{ display:"flex", gap:"0.4rem", alignItems:"center" }}>
             <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em" }}>SIZE</span>
@@ -436,7 +515,6 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark }) {
             <button onClick={onClose} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", fontSize:"0.85rem", padding:"4px 9px", borderRadius:3 }}>✕</button>
           </div>
         </div>
-        {/* content */}
         <div style={{ padding:"2rem 1.75rem", flex:1 }}>
           <div style={{ display:"flex", gap:"0.6rem", alignItems:"center", marginBottom:"1.25rem", flexWrap:"wrap" }}>
             <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", padding:"3px 9px", textTransform:"uppercase" }}>{article.source}</span>
@@ -446,7 +524,6 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark }) {
           {article.image && <div style={{ borderRadius:5, overflow:"hidden", marginBottom:"1.75rem", border:`1px solid ${th.border}` }}><img src={article.image} alt="" onError={e=>{e.target.parentElement.style.display="none";}} style={{ width:"100%", display:"block", maxHeight:360, objectFit:"cover" }} /></div>}
           <p style={{ fontFamily:"'Lora',serif", fontSize:`${fontSize}px`, color:th.textBody, lineHeight:1.85, marginBottom:"2rem" }}>{article.description || "Full article available at the original source."}</p>
           <div style={{ borderTop:`1px solid ${th.borderSub}`, paddingTop:"1.25rem", display:"flex", flexDirection:"column", gap:"0.75rem" }}>
-            <p style={{ color:th.textMuted, fontSize:"0.7rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em" }}>Preview from RSS feed. Read the full story below.</p>
             <div style={{ display:"flex", gap:"0.75rem", flexWrap:"wrap" }}>
               <button onClick={() => setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.65rem 1.25rem", borderRadius:4, cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem", letterSpacing:"0.1em" }}>⬡ READ IN-APP</button>
               <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.65rem 1.25rem", borderRadius:4, textDecoration:"none", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem", letterSpacing:"0.1em" }}>OPEN IN BROWSER ↗</a>
@@ -466,6 +543,37 @@ function ThemeToggle({ night, onToggle, th }) {
       <span style={{ fontSize:"0.8rem", lineHeight:1 }}>{night?"☀️":"🌙"}</span>
       <span style={{ color:th.accent, fontSize:"0.56rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em" }} className="toggle-label">{night?"DAY":"NIGHT"}</span>
     </button>
+  );
+}
+
+// ─── WEATHER WIDGET ───────────────────────────────────────────────────────────
+function WeatherWidget({ weather, th }) {
+  if (!weather) return null;
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", background:th.accentBg, border:`1px solid ${th.accentBord}`, borderRadius:20, padding:"0.25rem 0.75rem", flexShrink:0, animation:"fadeIn 0.4s ease" }}>
+      <span style={{ fontSize:"0.9rem", lineHeight:1 }}>{weather.icon}</span>
+      <span style={{ color:th.accent, fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
+        {weather.temp}°C {weather.city && <span style={{ opacity:0.7 }}>· {weather.city}</span>}
+      </span>
+    </div>
+  );
+}
+
+// ─── BREAKING NEWS BANNER ─────────────────────────────────────────────────────
+function BreakingBanner({ article, onClick, th }) {
+  const [visible, setVisible] = useState(true);
+  if (!article || !visible) return null;
+  return (
+    <div style={{ background:`linear-gradient(90deg,rgba(239,68,68,0.12),rgba(239,68,68,0.06))`, borderBottom:`1px solid rgba(239,68,68,0.25)`, padding:"0.55rem 1rem", display:"flex", alignItems:"center", gap:"0.75rem", animation:"slideDown 0.4s ease", cursor:"pointer" }} onClick={() => onClick(article)}>
+      <div style={{ position:"relative", flexShrink:0 }}>
+        <div style={{ width:8, height:8, borderRadius:"50%", background:"#ef4444" }} />
+        <div style={{ position:"absolute", inset:"-3px", borderRadius:"50%", border:"1px solid rgba(239,68,68,0.4)", animation:"ping 1.5s ease-in-out infinite" }} />
+      </div>
+      <span style={{ color:"#ef4444", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.16em", textTransform:"uppercase", flexShrink:0 }}>Breaking</span>
+      <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Playfair Display',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>{article.title}</p>
+      <span style={{ color:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", flexShrink:0 }}>{timeAgo(article.publishedAt)}</span>
+      <button onClick={e=>{e.stopPropagation();setVisible(false);}} style={{ background:"transparent", border:"none", color:"rgba(239,68,68,0.5)", cursor:"pointer", fontSize:"0.75rem", padding:"0 4px", flexShrink:0 }}>✕</button>
+    </div>
   );
 }
 
@@ -494,7 +602,7 @@ function ContactPopup({ onClose, th }) {
           <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'DM Mono',monospace", wordBreak:"break-all" }}>{CONTACT_EMAIL}</p>
         </div>
         <div style={{ display:"flex", gap:"0.5rem" }}>
-          <button onClick={copyEmail} style={{ flex:1, background:copied?"rgba(74,222,128,0.1)":th.accentBg, border:`1px solid ${copied?"rgba(74,222,128,0.3)":th.accentBord}`, color:copied?"#4ade80":th.accent, cursor:"pointer", padding:"0.6rem", borderRadius:5, fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", transition:"all 0.2s" }}>{copied ? "✓ COPIED" : "COPY EMAIL"}</button>
+          <button onClick={copyEmail} style={{ flex:1, background:copied?"rgba(74,222,128,0.1)":th.accentBg, border:`1px solid ${copied?"rgba(74,222,128,0.3)":th.accentBord}`, color:copied?"#4ade80":th.accent, cursor:"pointer", padding:"0.6rem", borderRadius:5, fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", transition:"all 0.2s" }}>{copied?"✓ COPIED":"COPY EMAIL"}</button>
           <a href={`mailto:${CONTACT_EMAIL}`} style={{ flex:1, background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.6rem", borderRadius:5, fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", letterSpacing:"0.1em", textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>SEND EMAIL ↗</a>
         </div>
       </div>
@@ -502,7 +610,7 @@ function ContactPopup({ onClose, th }) {
   );
 }
 
-// ─── SAVED ARTICLES VIEW ──────────────────────────────────────────────────────
+// ─── SAVED VIEW ───────────────────────────────────────────────────────────────
 function SavedView({ bookmarks, onClick, onBookmark, th }) {
   if (bookmarks.length === 0) {
     return (
@@ -515,9 +623,39 @@ function SavedView({ bookmarks, onClick, onBookmark, th }) {
   }
   return (
     <div className="news-grid">
-      {bookmarks.map((article, i) => (
-        <NewsCard key={article.id || i} article={article} index={i} onClick={onClick} th={th} bookmarks={bookmarks} onBookmark={onBookmark} />
+      {bookmarks.map((article,i) => (
+        <NewsCard key={article.id||i} article={article} index={i} onClick={onClick} th={th} bookmarks={bookmarks} onBookmark={onBookmark} />
       ))}
+    </div>
+  );
+}
+
+// ─── LIVE VIDEO VIEW ──────────────────────────────────────────────────────────
+function LiveView({ videos, loading, onPlay, th }) {
+  if (loading) {
+    return (
+      <div className="news-grid">
+        {[1,2,3,4,5,6].map(i => (
+          <div key={i} style={{ background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:6, overflow:"hidden" }}>
+            <div style={{ paddingBottom:"56.25%", background:th.bgSkeleton1, position:"relative" }}>
+              <div style={{ position:"absolute", inset:0, background:`linear-gradient(90deg,${th.bgSkeleton1} 25%,${th.bgSkeleton2} 50%,${th.bgSkeleton1} 75%)`, backgroundSize:"200% 100%", animation:"shimmer 1.6s infinite" }} />
+            </div>
+            <div style={{ padding:"0.9rem", display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+              <div style={{ height:12, width:"40%", background:th.bgSkeleton1, borderRadius:3 }} />
+              <div style={{ height:16, background:th.bgSkeleton1, borderRadius:3 }} />
+              <div style={{ height:16, width:"70%", background:th.bgSkeleton1, borderRadius:3 }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (!videos.length) {
+    return <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em" }}>NO VIDEOS FOUND</div>;
+  }
+  return (
+    <div className="news-grid">
+      {videos.map((video,i) => <VideoCard key={video.id||i} video={video} index={i} onClick={onPlay} th={th} />)}
     </div>
   );
 }
@@ -527,9 +665,11 @@ export default function NewsApp() {
   const [night,           setNight]           = useState(() => { try { return localStorage.getItem("theBriefTheme") !== "day"; } catch { return true; } });
   const [activeCategory,  setActiveCategory]  = useState("top");
   const [articles,        setArticles]        = useState([]);
+  const [videos,          setVideos]          = useState([]);
   const [loading,         setLoading]         = useState(true);
   const [error,           setError]           = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [selectedVideo,   setSelectedVideo]   = useState(null);
   const [lastUpdated,     setLastUpdated]     = useState(null);
   const [search,          setSearch]          = useState("");
   const [showContact,     setShowContact]     = useState(false);
@@ -543,7 +683,7 @@ export default function NewsApp() {
   const toggleBookmark = (article) => {
     setBookmarks(prev => {
       const exists = prev.some(b => b.id === article.id);
-      const next   = exists ? prev.filter(b => b.id !== article.id) : [article, ...prev];
+      const next   = exists ? prev.filter(b => b.id !== article.id) : [article,...prev];
       saveBookmarks(next);
       return next;
     });
@@ -551,15 +691,35 @@ export default function NewsApp() {
 
   const loadNews = useCallback(async (cat) => {
     if (cat === "saved") return;
-    if (cacheRef.current[cat]) { setArticles(cacheRef.current[cat]); setLoading(false); return; }
+    if (cacheRef.current[cat]) {
+      if (cat === "live") { setVideos(cacheRef.current[cat]); } else { setArticles(cacheRef.current[cat].articles || []); setVideos(cacheRef.current[cat].videos || []); }
+      setLoading(false); return;
+    }
     setLoading(true); setError(null);
     try {
-      const results = await Promise.allSettled(RSS_SOURCES[cat].map(fetchFeed));
-      const all = results.flatMap(r => r.status==="fulfilled" ? r.value : []);
-      const sorted = dedupe(all).sort((a,b) => new Date(b.publishedAt)-new Date(a.publishedAt));
-      if (!sorted.length) throw new Error("No articles found. Check your connection.");
-      cacheRef.current[cat] = sorted;
-      setArticles(sorted);
+      if (cat === "live") {
+        // Live tab — only YouTube
+        const results = await Promise.allSettled(YOUTUBE_SOURCES.live.map(fetchYouTubeFeed));
+        const all = results.flatMap(r => r.status==="fulfilled" ? r.value : []);
+        const sorted = dedupe(all).sort((a,b) => new Date(b.publishedAt)-new Date(a.publishedAt));
+        cacheRef.current[cat] = sorted;
+        setVideos(sorted);
+        setArticles([]);
+      } else {
+        // Regular categories — articles + mixed YouTube videos
+        const [articleResults, videoResults] = await Promise.all([
+          Promise.allSettled((RSS_SOURCES[cat] || []).map(fetchFeed)),
+          Promise.allSettled((YOUTUBE_SOURCES[cat] || []).map(fetchYouTubeFeed)),
+        ]);
+        const allArticles = articleResults.flatMap(r => r.status==="fulfilled" ? r.value : []);
+        const allVideos   = videoResults.flatMap(r => r.status==="fulfilled" ? r.value : []);
+        const sortedArticles = dedupe(allArticles).sort((a,b) => new Date(b.publishedAt)-new Date(a.publishedAt));
+        const sortedVideos   = dedupe(allVideos).sort((a,b) => new Date(b.publishedAt)-new Date(a.publishedAt)).slice(0,4);
+        if (!sortedArticles.length && !sortedVideos.length) throw new Error("No content found. Check your connection.");
+        cacheRef.current[cat] = { articles: sortedArticles, videos: sortedVideos };
+        setArticles(sortedArticles);
+        setVideos(sortedVideos);
+      }
       setLastUpdated(new Date());
     } catch(e) { setError(e.message); }
     finally    { setLoading(false); }
@@ -567,14 +727,35 @@ export default function NewsApp() {
 
   useEffect(() => { loadNews(activeCategory); }, [activeCategory, loadNews]);
 
-  const filtered = activeCategory === "saved" ? bookmarks
-    : search.trim()
-      ? articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()) || a.source.toLowerCase().includes(search.toLowerCase()))
-      : articles;
+  // For mixed view: interleave videos into article grid every ~4 articles
+  const buildMixedFeed = () => {
+    if (!videos.length) return { featured: articles[0], rest: articles.slice(1), videoSlots: [] };
+    const featured   = articles[0];
+    const restArt    = articles.slice(1);
+    // Insert video cards after every 4 articles
+    const mixed = [];
+    let vIdx = 0;
+    restArt.forEach((a, i) => {
+      mixed.push({ ...a, _type:"article" });
+      if ((i + 1) % 4 === 0 && vIdx < videos.length) {
+        mixed.push({ ...videos[vIdx], _type:"video" });
+        vIdx++;
+      }
+    });
+    return { featured, mixed };
+  };
 
-  const featured       = activeCategory !== "saved" ? filtered[0] : null;
-  const rest           = activeCategory !== "saved" ? filtered.slice(1) : filtered;
-  const breakingArticle= articles[0] || null;
+  const filteredArticles = search.trim()
+    ? articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()) || a.source.toLowerCase().includes(search.toLowerCase()))
+    : articles;
+  const filteredVideos = search.trim()
+    ? videos.filter(v => v.title.toLowerCase().includes(search.toLowerCase()) || v.source.toLowerCase().includes(search.toLowerCase()))
+    : videos;
+
+  const { featured, mixed } = buildMixedFeed();
+  const breakingArticle = articles[0] || null;
+  const isLive  = activeCategory === "live";
+  const isSaved = activeCategory === "saved";
 
   return (
     <div style={{ minHeight:"100vh", background:th.bg, color:th.text, fontFamily:"'Lora',serif", transition:"background 0.3s, color 0.3s" }}>
@@ -614,18 +795,15 @@ export default function NewsApp() {
       {/* ── HEADER ── */}
       <header style={{ borderBottom:`1px solid ${th.border}`, position:"sticky", top:0, zIndex:50, background:th.bgHeader, backdropFilter:"blur(20px)", transition:"background 0.3s" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", justifyContent:"space-between", alignItems:"center", height:56, gap:"0.75rem" }}>
-          {/* wordmark */}
           <div style={{ display:"flex", alignItems:"baseline", gap:"0.08rem", flexShrink:0 }}>
             <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.textHead, letterSpacing:"-0.03em" }}>The</span>
             <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.accent, letterSpacing:"-0.03em" }}>Brief</span>
             <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.44rem", color:th.textMuted, letterSpacing:"0.2em", marginLeft:"0.35rem", textTransform:"uppercase" }}>Live</span>
           </div>
-          {/* search */}
           <div style={{ flex:1, maxWidth:260, position:"relative", display:"flex", alignItems:"center" }}>
             <span style={{ position:"absolute", left:10, color:th.textMuted, fontSize:"0.85rem", pointerEvents:"none" }}>⌕</span>
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." style={{ width:"100%", background:th.bgInput, border:`1px solid ${th.border}`, borderRadius:5, padding:"0.4rem 0.7rem 0.4rem 1.9rem", color:th.text, fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", transition:"border-color 0.2s" }} />
           </div>
-          {/* right controls */}
           <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexShrink:0 }}>
             <WeatherWidget weather={weather} th={th} />
             {lastUpdated && <div className="hide-sm" style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textAlign:"right", lineHeight:1.5 }}><span style={{ display:"block" }}>UPDATED</span>{lastUpdated.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>}
@@ -633,21 +811,31 @@ export default function NewsApp() {
           </div>
         </div>
 
-        {/* ── BREAKING NEWS BANNER ── */}
+        {/* Breaking news banner */}
         {activeCategory === "top" && breakingArticle && (
           <BreakingBanner article={breakingArticle} onClick={setSelectedArticle} th={th} />
         )}
 
-        {/* tabs */}
+        {/* Category tabs */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:0, overflowX:"auto", borderTop:`1px solid ${th.borderTab}`, scrollbarWidth:"none" }}>
           {CATEGORIES.map(cat => (
-            <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setSearch(""); }} style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?th.accent:"transparent"}`, color:activeCategory===cat.id?th.accent:th.textMuted, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0 }}>
-              <span style={{ fontSize:"0.72rem" }}>{cat.icon}</span>
+            <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setSearch(""); }} style={{
+              background:"transparent", border:"none",
+              borderBottom:`2px solid ${activeCategory===cat.id?th.accent:"transparent"}`,
+              color:activeCategory===cat.id?th.accent:th.textMuted,
+              padding:"0.65rem 0.8rem", cursor:"pointer",
+              fontFamily:"'DM Mono',monospace", fontSize:"0.6rem",
+              letterSpacing:"0.12em", textTransform:"uppercase",
+              display:"flex", alignItems:"center", gap:"0.35rem",
+              whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0,
+            }}>
+              <span style={{ fontSize: cat.id === "live" ? "0.85rem" : "0.72rem" }}>{cat.icon}</span>
               <span className="cat-label">{cat.label}</span>
               {cat.id === "saved" && bookmarks.length > 0 && <span style={{ background:th.accent, color:night?"#080809":"#fff", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4 }}>{bookmarks.length}</span>}
+              {cat.id === "live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>LIVE</span>}
             </button>
           ))}
-          {activeCategory !== "saved" && (
+          {!isSaved && !isLive && (
             <button onClick={() => { delete cacheRef.current[activeCategory]; loadNews(activeCategory); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textFaint, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
               ↺ <span className="cat-label" style={{ fontSize:"0.55rem", letterSpacing:"0.12em" }}>REFRESH</span>
             </button>
@@ -657,20 +845,29 @@ export default function NewsApp() {
 
       {/* ── MAIN ── */}
       <main style={{ maxWidth:1200, margin:"0 auto", padding:"1.5rem 1rem 7rem" }}>
+        {/* Section header */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.25rem", paddingBottom:"0.7rem", borderBottom:`1px solid ${th.borderSub}` }}>
           <div style={{ display:"flex", alignItems:"center", gap:"0.6rem" }}>
-            <span style={{ color:th.accent, fontSize:"0.85rem" }}>{CATEGORIES.find(c=>c.id===activeCategory)?.icon}</span>
+            <span style={{ color: isLive ? "#ef4444" : th.accent, fontSize:"0.85rem" }}>{CATEGORIES.find(c=>c.id===activeCategory)?.icon}</span>
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", fontWeight:700, color:th.textHead, letterSpacing:"-0.01em" }}>{CATEGORIES.find(c=>c.id===activeCategory)?.label}</h1>
-            {activeCategory !== "saved" && !loading && filtered.length>0 && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>{filtered.length} STORIES</span>}
+            {isLive && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● LIVE</span>}
+            {!isSaved && !isLive && !loading && (filteredArticles.length + filteredVideos.length) > 0 && (
+              <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>
+                {filteredArticles.length} stories {filteredVideos.length > 0 && `· ${filteredVideos.length} videos`}
+              </span>
+            )}
           </div>
           {search && <button onClick={()=>setSearch("")} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"3px 9px", borderRadius:3, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace" }}>CLEAR ✕</button>}
         </div>
 
-        {/* Saved view */}
-        {activeCategory === "saved" && <SavedView bookmarks={bookmarks} onClick={setSelectedArticle} onBookmark={toggleBookmark} th={th} />}
+        {/* Saved */}
+        {isSaved && <SavedView bookmarks={bookmarks} onClick={setSelectedArticle} onBookmark={toggleBookmark} th={th} />}
+
+        {/* Live video tab */}
+        {isLive && <LiveView videos={filteredVideos} loading={loading} onPlay={setSelectedVideo} th={th} />}
 
         {/* Error */}
-        {activeCategory !== "saved" && error && (
+        {!isSaved && !isLive && error && (
           <div style={{ background:"rgba(239,68,68,0.06)", border:"1px solid rgba(239,68,68,0.18)", borderRadius:5, padding:"2rem", textAlign:"center" }}>
             <p style={{ color:"#f87171", fontFamily:"'DM Mono',monospace", fontSize:"0.75rem", letterSpacing:"0.08em", marginBottom:"1rem" }}>⚠ {error}</p>
             <button onClick={()=>{ delete cacheRef.current[activeCategory]; loadNews(activeCategory); }} style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#f87171", cursor:"pointer", padding:"6px 16px", borderRadius:3, fontFamily:"'DM Mono',monospace", fontSize:"0.66rem", letterSpacing:"0.1em" }}>↺ RETRY</button>
@@ -678,7 +875,7 @@ export default function NewsApp() {
         )}
 
         {/* Skeletons */}
-        {activeCategory !== "saved" && loading && !error && (
+        {!isSaved && !isLive && loading && !error && (
           <div className="news-grid">
             <div className="featured-card"><SkeletonCard featured th={th} /></div>
             {[1,2,3,4].map(i=><SkeletonCard key={i} th={th} />)}
@@ -686,37 +883,42 @@ export default function NewsApp() {
         )}
 
         {/* No search results */}
-        {activeCategory !== "saved" && !loading && !error && filtered.length===0 && search && (
+        {!isSaved && !isLive && !loading && !error && filteredArticles.length===0 && filteredVideos.length===0 && search && (
           <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em" }}>
-            NO STORIES MATCHING "{search.toUpperCase()}"
+            NO CONTENT MATCHING "{search.toUpperCase()}"
           </div>
         )}
 
-        {/* Article grid */}
-        {activeCategory !== "saved" && !loading && !error && filtered.length>0 && (
+        {/* Mixed article + video grid */}
+        {!isSaved && !isLive && !loading && !error && (filteredArticles.length > 0 || filteredVideos.length > 0) && (
           <div className="news-grid">
-            {featured && <div className="featured-card"><NewsCard article={featured} featured index={0} onClick={setSelectedArticle} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} /></div>}
-            {rest.map((article,i)=><NewsCard key={article.id||i} article={article} index={i+1} onClick={setSelectedArticle} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} />)}
+            {/* Featured article */}
+            {featured && (
+              <div className="featured-card">
+                <NewsCard article={featured} featured index={0} onClick={setSelectedArticle} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} />
+              </div>
+            )}
+            {/* Mixed articles + videos */}
+            {mixed ? mixed.map((item, i) => (
+              item._type === "video"
+                ? <VideoCard key={item.id||i} video={item} index={i+1} onClick={setSelectedVideo} th={th} />
+                : <NewsCard key={item.id||i} article={item} index={i+1} onClick={setSelectedArticle} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} />
+            )) : filteredArticles.slice(1).map((article,i) => (
+              <NewsCard key={article.id||i} article={article} index={i+1} onClick={setSelectedArticle} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} />
+            ))}
           </div>
         )}
       </main>
 
-      {/* ── SEO TEXT BLOCK ── */}
+      {/* ── SEO SECTION ── */}
       <section style={{ borderTop:`1px solid ${th.borderSub}`, padding:"2.5rem 1rem", transition:"background 0.3s" }}>
         <div style={{ maxWidth:1200, margin:"0 auto" }}>
-          {/* About */}
           <div style={{ marginBottom:"2rem", textAlign:"center" }}>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:700, color:th.textHead, marginBottom:"0.75rem", letterSpacing:"-0.01em" }}>
-              About The Brief
-            </h2>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:700, color:th.textHead, marginBottom:"0.75rem", letterSpacing:"-0.01em" }}>About The Brief</h2>
             <p style={{ color:th.textBody, fontSize:"0.82rem", fontFamily:"'Lora',serif", lineHeight:1.8, maxWidth:680, margin:"0 auto" }}>
-              The Brief is a free live news aggregator that pulls breaking stories from the world's most trusted sources —
-              including BBC News, Reuters, Al Jazeera, TechCrunch, New York Times, Sky News, Wired and Ars Technica.
-              No account required, no paywalls, no autoplay videos. Just clean, fast, live news updated continuously.
+              The Brief is a free live news aggregator pulling breaking stories from BBC News, Reuters, Al Jazeera, TechCrunch, New York Times, Sky News, Wired and Ars Technica. Now with live video news from YouTube. No account required, no paywalls, no autoplay ads. Just clean, fast, live news and video — updated continuously.
             </p>
           </div>
-
-          {/* Categories grid */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:"1rem", marginBottom:"2rem" }}>
             {[
               { title:"Top Stories", desc:"Breaking news and top headlines from BBC, Reuters and Sky News updated hourly." },
@@ -725,8 +927,9 @@ export default function NewsApp() {
               { title:"Business", desc:"Markets, finance and economy from BBC Business, NYT Business and Sky Business." },
               { title:"Science", desc:"Science, health and space from NYT Science, New Scientist and BBC Science." },
               { title:"Sports", desc:"Sports news and results from BBC Sport, NYT Sports and Sky Sports." },
-              { title:"Cars", desc:"Automotive news and reviews from Autocar, Top Gear and Car and Driver." },
-              { title:"Motorcycles", desc:"Motorcycle news from Motorcycle Daily, RideApart and webBikeWorld." },
+              { title:"Cars", desc:"Automotive news, reviews and videos from Autocar, Top Gear, Carwow and Car and Driver." },
+              { title:"Motorcycles", desc:"Motorcycle news and videos from Motorcycle Daily, RideApart, FortNine and RevZilla." },
+              { title:"Live Video", desc:"Live breaking news videos from BBC News, Al Jazeera, Reuters, DW News and AP News." },
             ].map(cat => (
               <div key={cat.title} style={{ padding:"1rem", background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:6 }}>
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.4rem" }}>{cat.title}</h3>
@@ -734,24 +937,14 @@ export default function NewsApp() {
               </div>
             ))}
           </div>
-
-          {/* Sources + features row */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:"1.5rem" }}>
             <div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>News Sources</h3>
-              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>
-                BBC News · Reuters · Al Jazeera · TechCrunch · New York Times · Sky News ·
-                Wired · Ars Technica · New Scientist · Autocar · Top Gear · Car and Driver ·
-                Motorcycle Daily · RideApart · webBikeWorld
-              </p>
+              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>BBC News · Reuters · Al Jazeera · TechCrunch · New York Times · Sky News · Wired · Ars Technica · New Scientist · Autocar · Top Gear · Car and Driver · Motorcycle Daily · RideApart · FortNine · RevZilla</p>
             </div>
             <div>
               <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>Features</h3>
-              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>
-                Free news aggregator · No account required · In-app article reader ·
-                Breaking news alerts · Weather by location · Save articles · Share stories ·
-                Night and day mode · Mobile friendly · No tracking · Updated continuously
-              </p>
+              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>Free news aggregator · Live video news · No account required · In-app article reader · Breaking news alerts · Weather by location · Save articles · Share stories · Night and day mode · Mobile friendly · No tracking · Updated continuously</p>
             </div>
           </div>
         </div>
@@ -761,15 +954,16 @@ export default function NewsApp() {
       <footer style={{ borderTop:`1px solid ${th.borderSub}`, padding:"1.5rem 1rem", transition:"color 0.3s" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"0.4rem", textAlign:"center" }}>
           <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600, letterSpacing:"0.05em" }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
-          <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS AGGREGATOR · RSS-POWERED</p>
+          <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
         </div>
       </footer>
 
-      {/* ── FLOATING CONTACT BUTTON ── */}
+      {/* ── FLOATING CONTACT ── */}
       <button onClick={() => setShowContact(c=>!c)} title="Contact Pedro Esteves" style={{ position:"fixed", bottom:"1.5rem", right:"1.5rem", background:th.accent, border:"none", borderRadius:"50%", width:48, height:48, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:90, boxShadow:"0 4px 20px rgba(0,0,0,0.3)", fontSize:"1.1rem", transition:"transform 0.2s, box-shadow 0.2s" }} onMouseEnter={e=>{ e.currentTarget.style.transform="scale(1.1)"; e.currentTarget.style.boxShadow="0 8px 28px rgba(0,0,0,0.4)"; }} onMouseLeave={e=>{ e.currentTarget.style.transform="scale(1)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.3)"; }}>✉</button>
 
       {showContact     && <ContactPopup onClose={() => setShowContact(false)} th={th} />}
       {selectedArticle && <ReaderPanel article={selectedArticle} onClose={()=>setSelectedArticle(null)} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} />}
+      {selectedVideo   && <VideoPlayer video={selectedVideo} onClose={()=>setSelectedVideo(null)} th={th} />}
     </div>
   );
 }
