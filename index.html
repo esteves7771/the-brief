@@ -12,7 +12,7 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://thebriefnews.org" />
 
-    <!-- ─── OPEN GRAPH (Facebook, WhatsApp, LinkedIn) ────────────────────── -->
+    <!-- ─── OPEN GRAPH ────────────────────────────────────────────────────── -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Brief" />
     <meta property="og:title" content="The Brief — Live News & Breaking Stories" />
@@ -39,7 +39,112 @@
     <!-- ─── FAVICON ───────────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- ─── STRUCTURED DATA (Google Rich Results) ────────────────────────── -->
+    <!-- ─── PERFORMANCE: DNS prefetch & preconnect ───────────────────────── -->
+    <!-- Tell browser to resolve these domains early -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.rss2json.com" />
+    <link rel="preconnect" href="https://api.open-meteo.com" />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+    <link rel="dns-prefetch" href="https://feeds.bbci.co.uk" />
+    <link rel="dns-prefetch" href="https://rss.nytimes.com" />
+
+    <!-- ─── PERFORMANCE: Preload fonts ──────────────────────────────────── -->
+    <!-- Preload the most critical font weights so text renders immediately -->
+    <link rel="preload" as="style"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;500&family=DM+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;500&family=DM+Mono:wght@400;500&display=swap"
+      media="print" onload="this.media='all'" />
+    <!-- Fallback for no-JS -->
+    <noscript>
+      <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;500&family=DM+Mono:wght@400;500&display=swap" />
+    </noscript>
+
+    <!-- ─── PERFORMANCE: Critical inline CSS ────────────────────────────── -->
+    <!-- Prevents flash of unstyled content (FOUC) and layout shift -->
+    <style>
+      /* Reset & base — prevents CLS from margin/padding jumps */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        background: #080809;
+        color: #f1f5f9;
+        font-family: Georgia, serif;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* App shell — prevents layout shift while React loads */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Initial loading state shown before React hydrates */
+      #app-loader {
+        position: fixed;
+        inset: 0;
+        background: #080809;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      #app-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader-wordmark {
+        font-family: Georgia, serif;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: #f8fafc;
+      }
+      .loader-wordmark span {
+        color: #f5c550;
+      }
+      .loader-bar {
+        width: 120px;
+        height: 2px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 2px;
+        margin: 1rem auto 0;
+        overflow: hidden;
+      }
+      .loader-bar::after {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 40%;
+        background: linear-gradient(90deg, #f5c550, #e8833a);
+        border-radius: 2px;
+        animation: loader-slide 1s ease-in-out infinite alternate;
+      }
+      @keyframes loader-slide {
+        from { transform: translateX(-100%); }
+        to   { transform: translateX(300%); }
+      }
+
+      /* Image lazy loading — prevents layout shift */
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+
+    <!-- ─── STRUCTURED DATA ───────────────────────────────────────────────── -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -62,13 +167,34 @@
     }
     </script>
 
-    <!-- ─── GOOGLE ADSENSE ────────────────────────────────────────────────── -->
+    <!-- ─── GOOGLE ADSENSE (async — non-blocking) ─────────────────────────── -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3779766735111739"
      crossorigin="anonymous"></script>
 
   </head>
   <body>
+
+    <!-- Loading screen shown instantly before React loads -->
+    <div id="app-loader">
+      <div style="text-align:center">
+        <div class="loader-wordmark">The<span>Brief</span></div>
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <!-- Hide loader once React has mounted -->
+    <script>
+      window.__briefLoaded = function() {
+        var loader = document.getElementById('app-loader');
+        if (loader) {
+          loader.classList.add('hidden');
+          setTimeout(function() { loader.remove(); }, 400);
+        }
+      };
+    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
