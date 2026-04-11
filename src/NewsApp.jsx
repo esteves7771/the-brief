@@ -57,20 +57,74 @@ const YOUTUBE_SOURCES = {
 };
 
 const CATEGORIES = [
-  { id:"top",      label:"Top",         icon:"◈" },
-  { id:"world",    label:"World",       icon:"◎" },
-  { id:"tech",     label:"Tech",        icon:"⟡" },
-  { id:"business", label:"Business",    icon:"◇" },
-  { id:"science",  label:"Science",     icon:"⬡" },
-  { id:"sports",   label:"Sports",      icon:"◉" },
-  { id:"cars",     label:"Cars",        icon:"▷" },
-  { id:"motos",    label:"Motorcycles", icon:"◍" },
-  { id:"live",     label:"Live Video",  icon:"▶" },
-  { id:"saved",    label:"Saved",       icon:"◆" },
+  { id:"top",      label:"Top",      short:"Top",   icon:"◈" },
+  { id:"world",    label:"World",    short:"World", icon:"◎" },
+  { id:"tech",     label:"Tech",     short:"Tech",  icon:"⟡" },
+  { id:"business", label:"Business", short:"Biz",   icon:"◇" },
+  { id:"science",  label:"Science",  short:"Sci",   icon:"⬡" },
+  { id:"sports",   label:"Sports",   short:"Sport", icon:"◉" },
+  { id:"cars",     label:"Cars",     short:"Cars",  icon:"▷" },
+  { id:"motos",    label:"Motorcycles", short:"Motos", icon:"◍" },
+  { id:"live",     label:"Live Video",  short:"Live",  icon:"▶" },
+  { id:"saved",    label:"Saved",    short:"Saved", icon:"◆" },
 ];
 
 const RSS2JSON     = "https://api.rss2json.com/v1/api.json?rss_url=";
 const CONTACT_EMAIL = "pedro.esteves.pt@proton.me";
+
+// ─── POLITICAL BIAS LOOKUP ────────────────────────────────────────────────────
+// Based on AllSides Media Bias Ratings (allsides.com) — updated April 2026
+// L = Left, LC = Lean Left, C = Centre, RC = Lean Right, R = Right
+const BIAS = {
+  // News sources
+  "BBC News":                    { rating:"C",  label:"Centre" },
+  "BBC News - Home":             { rating:"C",  label:"Centre" },
+  "BBC News - World":            { rating:"C",  label:"Centre" },
+  "BBC News - Science & Environment": { rating:"C", label:"Centre" },
+  "BBC News - Business":         { rating:"C",  label:"Centre" },
+  "BBC Sport - Sport":           { rating:"C",  label:"Centre" },
+  "Reuters":                     { rating:"C",  label:"Centre" },
+  "NYT > HomePage":              { rating:"LC", label:"Lean Left" },
+  "NYT > Science":               { rating:"LC", label:"Lean Left" },
+  "NYT > Sports":                { rating:"LC", label:"Lean Left" },
+  "NYT > Business":              { rating:"LC", label:"Lean Left" },
+  "New York Times":              { rating:"LC", label:"Lean Left" },
+  "The Latest News from the UK and Around the World | Sky News": { rating:"RC", label:"Lean Right" },
+  "Sky News":                    { rating:"RC", label:"Lean Right" },
+  "Al Jazeera English":          { rating:"LC", label:"Lean Left" },
+  "TechCrunch":                  { rating:"LC", label:"Lean Left" },
+  "Wired":                       { rating:"LC", label:"Lean Left" },
+  "Ars Technica":                { rating:"C",  label:"Centre" },
+  "New Scientist":               { rating:"C",  label:"Centre" },
+  // Car & Moto — rated as Centre (automotive journalism, not political)
+  "Autocar":                     { rating:"C",  label:"Centre" },
+  "Top Gear":                    { rating:"C",  label:"Centre" },
+  "Car and Driver":              { rating:"C",  label:"Centre" },
+  "Motorcycle Daily":            { rating:"C",  label:"Centre" },
+  "RideApart":                   { rating:"C",  label:"Centre" },
+  "webBikeWorld":                { rating:"C",  label:"Centre" },
+};
+
+// Colour per rating
+const BIAS_STYLE = {
+  L:  { color:"#3b82f6", bg:"rgba(59,130,246,0.12)", label:"Left" },
+  LC: { color:"#60a5fa", bg:"rgba(96,165,250,0.12)", label:"Lean Left" },
+  C:  { color:"#9ca3af", bg:"rgba(156,163,175,0.12)", label:"Centre" },
+  RC: { color:"#f87171", bg:"rgba(248,113,113,0.12)", label:"Lean Right" },
+  R:  { color:"#ef4444", bg:"rgba(239,68,68,0.12)",   label:"Right" },
+};
+
+function getBias(source) {
+  if (!source) return null;
+  // Try exact match first
+  if (BIAS[source]) return BIAS[source];
+  // Try partial match — handles slight variations in feed titles
+  const key = Object.keys(BIAS).find(k =>
+    source.toLowerCase().includes(k.toLowerCase()) ||
+    k.toLowerCase().includes(source.toLowerCase())
+  );
+  return key ? BIAS[key] : null;
+}
 
 // ─── WEATHER CODES ────────────────────────────────────────────────────────────
 const WX = {
@@ -320,6 +374,48 @@ function VideoCard({ video, index, onClick, th }) {
   );
 }
 
+// ─── BIAS DOT ─────────────────────────────────────────────────────────────────
+function BiasDot({ source }) {
+  const [showTip, setShowTip] = useState(false);
+  const bias = getBias(source);
+  if (!bias) return null;
+  const style = BIAS_STYLE[bias.rating];
+  if (!style) return null;
+
+  return (
+    <div
+      style={{ position:"relative", display:"inline-flex", alignItems:"center" }}
+      onMouseEnter={() => setShowTip(true)}
+      onMouseLeave={() => setShowTip(false)}
+    >
+      {/* The dot */}
+      <div style={{
+        width:7, height:7, borderRadius:"50%",
+        background: style.color,
+        border: `1.5px solid ${style.color}`,
+        opacity: 0.85,
+        cursor:"default",
+        flexShrink:0,
+      }} />
+      {/* Tooltip */}
+      {showTip && (
+        <div style={{
+          position:"absolute", bottom:"calc(100% + 5px)", left:"50%",
+          transform:"translateX(-50%)",
+          background:"rgba(0,0,0,0.85)", color:"#fff",
+          fontSize:"0.55rem", fontFamily:"'DM Mono',monospace",
+          letterSpacing:"0.08em", padding:"4px 8px", borderRadius:4,
+          whiteSpace:"nowrap", zIndex:10,
+          pointerEvents:"none",
+        }}>
+          {style.label} · AllSides
+          <div style={{ position:"absolute", bottom:-4, left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"4px solid transparent", borderRight:"4px solid transparent", borderTop:"4px solid rgba(0,0,0,0.85)" }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── NEWS CARD ────────────────────────────────────────────────────────────────
 function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark }) {
   const [hovered,  setHovered]  = useState(false);
@@ -361,6 +457,7 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
         <div style={{ display:"flex", gap:"0.45rem", alignItems:"center", flexWrap:"wrap" }}>
           {featured && <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", letterSpacing:"0.14em", padding:"2px 7px", fontFamily:"'DM Mono',monospace", textTransform:"uppercase" }}>◈ FEATURED</span>}
           <span style={{ color:th.textSource, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.05em" }}>{article.source}</span>
+          <BiasDot source={article.source} />
         </div>
         <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", whiteSpace:"nowrap" }}>{timeAgo(article.publishedAt)}</span>
       </div>
@@ -518,6 +615,7 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark }) {
         <div style={{ padding:"2rem 1.75rem", flex:1 }}>
           <div style={{ display:"flex", gap:"0.6rem", alignItems:"center", marginBottom:"1.25rem", flexWrap:"wrap" }}>
             <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", padding:"3px 9px", textTransform:"uppercase" }}>{article.source}</span>
+            <BiasDot source={article.source} />
             <span style={{ color:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace" }}>{timeAgo(article.publishedAt)}</span>
           </div>
           <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,4vw,1.9rem)", fontWeight:700, color:th.textHead, lineHeight:1.22, marginBottom:"1.5rem", letterSpacing:"-0.02em" }}>{article.title}</h1>
@@ -784,8 +882,12 @@ export default function NewsApp() {
           .news-grid{grid-template-columns:1fr}
           .featured-card{grid-column:span 1}
         }
+        @media(max-width:480px){
+          .cat-tab{padding:0.55rem 0.45rem !important}
+        }
         @media(max-width:420px){
-          .cat-label{display:none}
+          .cat-full{display:none !important}
+          .cat-short{display:inline !important;font-size:0.44rem !important;letter-spacing:0.04em !important}
           .toggle-label{display:none !important}
           .hide-sm{display:none !important}
         }
@@ -819,7 +921,7 @@ export default function NewsApp() {
         {/* Category tabs */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:0, overflowX:"auto", borderTop:`1px solid ${th.borderTab}`, scrollbarWidth:"none" }}>
           {CATEGORIES.map(cat => (
-            <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setSearch(""); }} style={{
+            <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setSearch(""); }} className="cat-tab" style={{
               background:"transparent", border:"none",
               borderBottom:`2px solid ${activeCategory===cat.id?th.accent:"transparent"}`,
               color:activeCategory===cat.id?th.accent:th.textMuted,
@@ -830,7 +932,7 @@ export default function NewsApp() {
               whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0,
             }}>
               <span style={{ fontSize: cat.id === "live" ? "0.85rem" : "0.72rem" }}>{cat.icon}</span>
-              <span className="cat-label">{cat.label}</span>
+              <span className="cat-label cat-full">{cat.label}</span><span className="cat-label cat-short" style={{display:"none"}}>{cat.short}</span>
               {cat.id === "saved" && bookmarks.length > 0 && <span style={{ background:th.accent, color:night?"#080809":"#fff", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4 }}>{bookmarks.length}</span>}
               {cat.id === "live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>LIVE</span>}
             </button>
