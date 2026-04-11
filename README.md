@@ -4,7 +4,7 @@
 
 🔗 **[thebriefnews.org](https://thebriefnews.org)**
 
-![The Brief Screenshot](https://thebriefnews.org/og-image.png)
+![The Brief Screenshot](https://github.com/esteves7771/the-brief/blob/2e5bc2cc17013159385d0078dc3d6a2701abf182/Screenshot%202026-04-11%20005934.png)
 
 ---
 
