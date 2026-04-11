@@ -701,6 +701,62 @@ export default function NewsApp() {
         )}
       </main>
 
+      {/* ── SEO TEXT BLOCK ── */}
+      <section style={{ borderTop:`1px solid ${th.borderSub}`, padding:"2.5rem 1rem", transition:"background 0.3s" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          {/* About */}
+          <div style={{ marginBottom:"2rem", textAlign:"center" }}>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:700, color:th.textHead, marginBottom:"0.75rem", letterSpacing:"-0.01em" }}>
+              About The Brief
+            </h2>
+            <p style={{ color:th.textBody, fontSize:"0.82rem", fontFamily:"'Lora',serif", lineHeight:1.8, maxWidth:680, margin:"0 auto" }}>
+              The Brief is a free live news aggregator that pulls breaking stories from the world's most trusted sources —
+              including BBC News, Reuters, Al Jazeera, TechCrunch, New York Times, Sky News, Wired and Ars Technica.
+              No account required, no paywalls, no autoplay videos. Just clean, fast, live news updated continuously.
+            </p>
+          </div>
+
+          {/* Categories grid */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:"1rem", marginBottom:"2rem" }}>
+            {[
+              { title:"Top Stories", desc:"Breaking news and top headlines from BBC, Reuters and Sky News updated hourly." },
+              { title:"World News", desc:"Global news and geopolitics from Al Jazeera, BBC World and Sky News World." },
+              { title:"Technology", desc:"Tech news, reviews and analysis from TechCrunch, Wired and Ars Technica." },
+              { title:"Business", desc:"Markets, finance and economy from BBC Business, NYT Business and Sky Business." },
+              { title:"Science", desc:"Science, health and space from NYT Science, New Scientist and BBC Science." },
+              { title:"Sports", desc:"Sports news and results from BBC Sport, NYT Sports and Sky Sports." },
+              { title:"Cars", desc:"Automotive news and reviews from Autocar, Top Gear and Car and Driver." },
+              { title:"Motorcycles", desc:"Motorcycle news from Motorcycle Daily, RideApart and webBikeWorld." },
+            ].map(cat => (
+              <div key={cat.title} style={{ padding:"1rem", background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:6 }}>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.4rem" }}>{cat.title}</h3>
+                <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.65 }}>{cat.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Sources + features row */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:"1.5rem" }}>
+            <div>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>News Sources</h3>
+              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>
+                BBC News · Reuters · Al Jazeera · TechCrunch · New York Times · Sky News ·
+                Wired · Ars Technica · New Scientist · Autocar · Top Gear · Car and Driver ·
+                Motorcycle Daily · RideApart · webBikeWorld
+              </p>
+            </div>
+            <div>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>Features</h3>
+              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>
+                Free news aggregator · No account required · In-app article reader ·
+                Breaking news alerts · Weather by location · Save articles · Share stories ·
+                Night and day mode · Mobile friendly · No tracking · Updated continuously
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── FOOTER ── */}
       <footer style={{ borderTop:`1px solid ${th.borderSub}`, padding:"1.5rem 1rem", transition:"color 0.3s" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"0.4rem", textAlign:"center" }}>
