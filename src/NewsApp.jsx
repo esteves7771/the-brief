@@ -264,7 +264,7 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
       {/* featured image */}
       {featured && article.image && !imgErr && (
         <div style={{ height:200, borderRadius:4, overflow:"hidden", background:th.bgSkeleton1, flexShrink:0 }}>
-          <img src={article.image} alt="" onError={() => setImgErr(true)} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+          <img src={article.image} alt="" loading="lazy" decoding="async" onError={() => setImgErr(true)} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
         </div>
       )}
 
