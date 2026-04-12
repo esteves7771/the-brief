@@ -78,12 +78,11 @@ function parseYouTubeAtom(xml, maxCount = 6) {
 
     const url = `https://www.youtube.com/watch?v=${videoId}`;
 
-    // Filter out YouTube Shorts — irrelevant for a news app
-    const isShort = title.toLowerCase().includes('#shorts')
-      || title.toLowerCase().includes('#short')
-      || description.toLowerCase().includes('#shorts');
-
-    if (isShort) continue;
+    // Skip only if title is EXACTLY "#shorts" or "#short" (standalone)
+    // Many compilation channels tag their LONG videos with #shorts in description
+    // so we only filter the title — and only if it's the WHOLE title or ends with it
+    const t = title.toLowerCase().trim();
+    if (t === '#shorts' || t === '#short' || t === 'shorts' || t === 'short') continue;
 
     items.push({
       videoId,
