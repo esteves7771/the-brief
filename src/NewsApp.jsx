@@ -51,6 +51,10 @@ const RSS_SOURCES = {
 
 
   crypto:   ["https://cointelegraph.com/rss","https://crypto.news/feed","https://news.bitcoin.com/feed"],
+  // ── Vibe sub-sections ────────────────────────────────────────────────────────
+  goodnews: ["https://www.goodnewsnetwork.org/feed/","https://www.positive.news/feed/","https://www.sunnyskyz.com/feed/"],
+  funny:    ["https://www.boredpanda.com/feed/","https://feeds.feedburner.com/TheOnion","https://www.oddee.com/feed/"],
+  weird:    ["https://www.odditycentral.com/feed","https://www.atlasobscura.com/feeds/latest","https://www.mentalfloss.com/rss"],
 };
 
 // ─── CATEGORY KEYWORD FILTERS ────────────────────────────────────────────────
@@ -170,6 +174,38 @@ const CATEGORY_FILTERS = {
       "guardian science","bbc science","nyt science","eos.org","nautil"
     ],
   },
+  goodnews: {
+    require: [
+      "rescue","saved","hero","heroic","breakthrough","discovery","achieve","achievement",
+      "success","celebrate","celebration","hope","inspire","inspiring","inspirational",
+      "kindness","donate","donation","charity","volunteer","volunteers","community",
+      "good news","positive","uplifting","heartwarming","wholesome","amazing","wonderful",
+      "record","milestone","first time","historic","revolutionary","clean energy",
+      "cure","treatment","recover","recovery","children","animals","reunion",
+      "scholarship","education","innovation","peace","agreement","friendship",
+      "good","great","best","joy","love","help","support","win","victory"
+    ],
+  },
+  funny: {
+    require: [
+      "funny","hilarious","comedy","laugh","lol","viral","weird","bizarre","unusual",
+      "unexpected","surprised","surprise","mistake","fail","fails","awkward","silly",
+      "prank","joke","jokes","meme","memes","satire","spoof","parody","absurd",
+      "bizarre","strange","odd","quirky","ridiculous","outrageous","unbelievable",
+      "onion","boredpanda","oddee","humor","humour","comic","comical","amusing"
+    ],
+  },
+  weird: {
+    require: [
+      "weird","strange","bizarre","unusual","mysterious","mystery","unexplained",
+      "odd","quirky","rare","ancient","discovery","uncovered","unearthed","found",
+      "fossil","artifact","creature","species","new species","giant","miniature",
+      "record","world record","first ever","never before","unusual","exotic",
+      "oddity","phenomenon","phenomenon","ritual","tradition","superstition",
+      "conspiracy","haunted","ghost","ufo","alien","cryptid","legend","myth",
+      "atlasobscura","mentalfloss","odditycentral","iflscience"
+    ],
+  },
 };
 
 // Returns true if the article passes the category filter (should be shown)
@@ -198,6 +234,22 @@ const YOUTUBE_SOURCES = {
   motos:    [YT("UCB_cdRhIDhlavY2I5URSC7g"),YT("UCMkMkYwBjSxAaxEBdQBxl5Q"),YT("UCpfBFKpvBpbv7OEzCi8YVWQ"),YT("UC_CjHSEYBFGcuL9Sj-AhVIg")],
   stocks:   [YT("UCvJJ_dzjViJCoLf5uKUTwoA"),YT("UCrGyqELkKkXKggRphOTv0Tg")],
   crypto:   [YT("UCCatR7nWbYrkVXdxXb4cGXw"),YT("UCYP7pHJAN4pOHb62F2p3eRQ")],
+  // ── Vibe YouTube channels ─────────────────────────────────────────────────
+  // 😊 Good News — wholesome, heartwarming, philanthropy, animal rescues
+  // All long-form channels that post compilations and full videos (not Shorts-first)
+  goodnews: [
+    YT("UCY1kMZp36IQSyNx_9h4mpCg"), // Mark Rober — long-form charity experiments
+    YT("UCPIycc6GXKVBECHOSFBSg"),   // The Dodo — animal rescue long-form
+    YT("UCX6OQ3DkcsbYNE6H8uQQuVA"), // MrBeast — long-form philanthropy challenges
+    YT("UC4BGHU6j0sTBm_3bvVaVNFw"), // AFV — America Funniest Home Videos (wholesome)
+  ],
+  // 😂 Funny — viral fails, comedy compilations, long-form humour
+  funny: [
+    YT("UCPDis9pjXuqyI7RYLJ-TTSA"), // FailArmy — weekly fail compilations
+    YT("UCdC0An4ZPNr_YiFiYoVbwaw"), // Daily Dose of Internet — weekly viral clips
+    YT("UC4BGHU6j0sTBm_3bvVaVNFw"), // AFV — classic funny home videos
+    YT("UCKqH_9mk1waLgBiL2vT5b9g"), // Just For Laughs Gags — prank compilations
+  ],
 };
 
 // ─── WORLD SUB-REGIONS ────────────────────────────────────────────────────────
@@ -240,6 +292,20 @@ const PODCAST_FEEDS = [
   "https://www.spreaker.com/show/5765785/episodes/feed",    // Reuters World News Daily
 ];
 
+// ─── BUSINESS SUB-SECTIONS ───────────────────────────────────────────────────
+const BUSINESS_SECTIONS = [
+  { id:"business", label:"📊 Business", short:"News" },
+  { id:"stocks",   label:"📈 Stocks",   short:"Stocks" },
+  { id:"crypto",   label:"₿ Crypto",   short:"Crypto" },
+];
+
+// ─── VIBE SECTIONS ────────────────────────────────────────────────────────────
+const VIBE_SECTIONS = [
+  { id:"goodnews", label:"😊 Good News", short:"Good" },
+  { id:"funny",    label:"😂 Funny",     short:"Funny" },
+  { id:"weird",    label:"🌀 Weird",     short:"Weird" },
+];
+
 const WORLD_REGIONS = [
   { id:"world",    label:"🌐 All World",    short:"All" },
   { id:"europe",   label:"🇪🇺 Europe",      short:"EU" },
@@ -249,18 +315,17 @@ const WORLD_REGIONS = [
 ];
 
 const CATEGORIES = [
-  { id:"top",      label:"Top",          short:"Top",   icon:"◈" },
-  { id:"world",    label:"World",        short:"World", icon:"◎", hasDropdown:true },
-  { id:"tech",     label:"Tech",         short:"Tech",  icon:"⟡" },
-  { id:"business", label:"Business",     short:"Biz",   icon:"◇" },
-  { id:"science",  label:"Science",      short:"Sci",   icon:"⬡" },
-  { id:"sports",   label:"Sports",       short:"Sport", icon:"◉" },
-  { id:"cars",     label:"Cars",         short:"Cars",  icon:"▷" },
-  { id:"motos",    label:"Motorcycles",  short:"Motos",   icon:"◍" },
-  { id:"stocks",   label:"Stocks",       short:"Stocks",  icon:"📈" },
-  { id:"crypto",   label:"Crypto",       short:"Crypto",  icon:"₿" },
-  { id:"live",     label:"Media",        short:"Media",   icon:"📡" },
-  { id:"saved",    label:"Saved",        short:"Saved",   icon:"◆" },
+  { id:"top",      label:"Top",         short:"Top",   icon:"◈" },
+  { id:"world",    label:"World",       short:"World", icon:"◎", hasDropdown:true },
+  { id:"tech",     label:"Tech",        short:"Tech",  icon:"⟡" },
+  { id:"business", label:"Business",    short:"Biz",   icon:"◇" },
+  { id:"science",  label:"Science",     short:"Sci",   icon:"⬡" },
+  { id:"sports",   label:"Sports",      short:"Sport", icon:"◉" },
+  { id:"cars",     label:"Cars",        short:"Cars",  icon:"▷" },
+  { id:"motos",    label:"Motorcycles", short:"Motos", icon:"◍" },
+  { id:"vibe",     label:"Vibe",        short:"Vibe",  icon:"😊" },
+  { id:"live",     label:"Media",       short:"Media", icon:"📡" },
+  { id:"saved",    label:"Saved",       short:"Saved", icon:"◆" },
 ];
 
 const RSS2JSON     = "https://api.rss2json.com/v1/api.json?rss_url=";
@@ -1569,6 +1634,44 @@ function LiveView({ videos, loading, onPlay, th }) {
 }
 
 // ─── WORLD DROPDOWN ───────────────────────────────────────────────────────────
+// BusinessSectionBar
+function BusinessSectionBar({ activeSection, onSelect, th }) {
+  return (
+    <div style={{ borderTop:`1px solid ${th.borderTab}`, background:th.bgHeader, overflowX:"auto", scrollbarWidth:"none" }}>
+      <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }}>
+        {BUSINESS_SECTIONS.map(s => (
+          <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
+            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.textMuted, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// VibeSectionBar
+function VibeSectionBar({ activeSection, onSelect, th }) {
+  const colors = { goodnews:"#22c55e", funny:"#f59e0b", weird:"#a855f7" };
+  const col = colors[activeSection] || th.accent;
+  return (
+    <div style={{ borderTop:`1px solid ${th.borderTab}`, background:th.bgHeader, overflowX:"auto", scrollbarWidth:"none" }}>
+      <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }}>
+        {VIBE_SECTIONS.map(s => {
+          const c = colors[s.id];
+          const active = activeSection === s.id;
+          return (
+            <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
+              style={{ background:active?`${c}18`:"transparent", border:`1px solid ${active?c:th.border}`, color:active?c:th.textMuted, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // WorldRegionBar — scrollable pill bar, no z-index issues, mobile friendly
 function WorldRegionBar({ activeRegion, onSelect, th }) {
   return (
@@ -1606,8 +1709,10 @@ function WorldRegionBar({ activeRegion, onSelect, th }) {
 export default function NewsApp() {
   const [night,           setNight]           = useState(()=>{ try{return localStorage.getItem("theBriefTheme")!=="day";}catch{return true;} });
   const [activeCategory,  setActiveCategory]  = useState("top");
-  const [activeRegion,    setActiveRegion]    = useState("world");
+  const [activeRegion,       setActiveRegion]       = useState("world");
   const [activeMediaSection, setActiveMediaSection] = useState("video");
+  const [activeBusinessSection, setActiveBusinessSection] = useState("business");
+  const [activeVibeSection,     setActiveVibeSection]     = useState("goodnews");
   const [articles,        setArticles]        = useState([]);
   const [videos,          setVideos]          = useState([]);
   const [loading,         setLoading]         = useState(true);
@@ -1651,12 +1756,20 @@ export default function NewsApp() {
   };
 
   // Effective feed key — world uses sub-region, others use category directly
-  const WORLD_CATS = ["world","europe","asia","americas","mideast"];
-  const feedKey = activeCategory === "world" ? activeRegion : activeCategory;
+  const WORLD_CATS    = ["world","europe","asia","americas","mideast"];
+  const BUSINESS_CATS = ["business","stocks","crypto"];
+  const VIBE_CATS     = ["goodnews","funny","weird"];
+  const feedKey = activeCategory === "world"    ? activeRegion
+                : activeCategory === "business" ? activeBusinessSection
+                : activeCategory === "vibe"     ? activeVibeSection
+                : activeCategory;
   
   // Category accent overrides for stocks (green) and crypto (orange)
-  const catAccent = activeCategory === "stocks" ? "#22c55e"
-    : activeCategory === "crypto" ? "#f97316"
+  const catAccent = activeVibeSection === "goodnews" && activeCategory === "vibe" ? "#22c55e"
+    : activeVibeSection === "funny"   && activeCategory === "vibe" ? "#f59e0b"
+    : activeVibeSection === "weird"   && activeCategory === "vibe" ? "#a855f7"
+    : activeBusinessSection === "stocks" && activeCategory === "business" ? "#22c55e"
+    : activeBusinessSection === "crypto" && activeCategory === "business" ? "#f97316"
     : th.accent;
 
   const loadNews = useCallback(async (key) => {
@@ -1695,7 +1808,7 @@ export default function NewsApp() {
         ]);
         const allArt = artRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
         const allVid = vidRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
-        const SOFT_FILTER_CATEGORIES = new Set(["cars","stocks","crypto","science","sports","motos","tech","business"]);
+        const SOFT_FILTER_CATEGORIES = new Set(["cars","stocks","crypto","science","sports","motos","tech","business","goodnews","funny","weird"]);
         let filteredArt = allArt.filter(a => passesFilter(a, key));
         if (SOFT_FILTER_CATEGORIES.has(key) && filteredArt.length < 3) {
           filteredArt = allArt;
@@ -1724,14 +1837,16 @@ export default function NewsApp() {
   useEffect(() => { loadNews(feedKey); }, [feedKey, loadNews]);
 
   // Reset trending filter when category changes
-  useEffect(() => { setTrendingFilter(null); }, [activeCategory, activeRegion]);
+  useEffect(() => { setTrendingFilter(null); }, [activeCategory, activeRegion, activeBusinessSection, activeVibeSection]);
 
   const handleCategoryClick = (id) => {
     setActiveCategory(id);
     setSearch("");
     scrollToTop();
-    if (id !== "world") setActiveRegion("world");
-    if (id !== "live")  setActiveMediaSection("video");
+    if (id !== "world")    setActiveRegion("world");
+    if (id !== "live")     setActiveMediaSection("video");
+    if (id !== "business") setActiveBusinessSection("business");
+    if (id !== "vibe")     setActiveVibeSection("goodnews");
   };
   const handleRegionSelect = (regionId) => {
     setActiveRegion(regionId);
@@ -1740,6 +1855,16 @@ export default function NewsApp() {
   };
   const handleMediaSectionSelect = (sectionId) => {
     setActiveMediaSection(sectionId);
+    scrollToTop();
+  };
+  const handleBusinessSectionSelect = (sectionId) => {
+    setActiveBusinessSection(sectionId);
+    setSearch("");
+    scrollToTop();
+  };
+  const handleVibeSectionSelect = (sectionId) => {
+    setActiveVibeSection(sectionId);
+    setSearch("");
     scrollToTop();
   };
 
@@ -1790,12 +1915,16 @@ const buildMixed = () => {
   };
   const { featured, mixed } = buildMixed();
   const breakingArticle = articles[0] || null;
-  const isMedia  = activeCategory === "live";
-  const isLive   = activeCategory === "live"; // keep for backward compat
-  const isSaved  = activeCategory === "saved";
-  const isWorld  = activeCategory === "world";
-  const currentRegion = WORLD_REGIONS.find(r=>r.id===activeRegion) || WORLD_REGIONS[0];
-  const currentMediaSection = MEDIA_SECTIONS.find(s=>s.id===activeMediaSection) || MEDIA_SECTIONS[0];
+  const isMedia    = activeCategory === "live";
+  const isLive     = activeCategory === "live";
+  const isSaved    = activeCategory === "saved";
+  const isWorld    = activeCategory === "world";
+  const isBusiness = activeCategory === "business";
+  const isVibe     = activeCategory === "vibe";
+  const currentRegion          = WORLD_REGIONS.find(r=>r.id===activeRegion) || WORLD_REGIONS[0];
+  const currentMediaSection    = MEDIA_SECTIONS.find(s=>s.id===activeMediaSection) || MEDIA_SECTIONS[0];
+  const currentBusinessSection = BUSINESS_SECTIONS.find(s=>s.id===activeBusinessSection) || BUSINESS_SECTIONS[0];
+  const currentVibeSection     = VIBE_SECTIONS.find(s=>s.id===activeVibeSection) || VIBE_SECTIONS[0];
 
   return (
     <div style={{ minHeight:"100vh", background:th.bg, color:th.text, fontFamily:"'Lora',serif", transition:"background 0.3s, color 0.3s", overflowX:"hidden", width:"100%" }}>
@@ -1878,18 +2007,29 @@ const buildMixed = () => {
         {/* Category tabs */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:0, overflowX:"auto", borderTop:`1px solid ${th.borderTab}`, scrollbarWidth:"none" }}>
           {CATEGORIES.map(cat => (
-            <button key={cat.id} onClick={()=>handleCategoryClick(cat.id)} className="cat-tab" style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?(cat.id==="stocks"?"#22c55e":cat.id==="crypto"?"#f97316":th.accent):"transparent"}`, color:activeCategory===cat.id?(cat.id==="stocks"?"#22c55e":cat.id==="crypto"?"#f97316":th.accent):th.textMuted, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0 }}>
+            <button key={cat.id} onClick={()=>handleCategoryClick(cat.id)} className="cat-tab" style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?catAccent:"transparent"}`, color:activeCategory===cat.id?catAccent:th.textMuted, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0 }}>
               <span style={{ fontSize:cat.id==="live"?"0.85rem":"0.72rem" }}>{cat.icon}</span>
               <span className="cat-label cat-full">{cat.label}</span>
               <span className="cat-label cat-short" style={{ display:"none" }}>{cat.short}</span>
-              {/* World region indicator */}
+              {/* Sub-section indicators */}
               {cat.id==="world" && activeCategory==="world" && activeRegion !== "world" && (
                 <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
                   {WORLD_REGIONS.find(r=>r.id===activeRegion)?.short}
                 </span>
               )}
+              {cat.id==="business" && activeCategory==="business" && activeBusinessSection !== "business" && (
+                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:activeBusinessSection==="stocks"?"#22c55e":"#f97316", letterSpacing:"0.06em" }}>
+                  {BUSINESS_SECTIONS.find(s=>s.id===activeBusinessSection)?.short}
+                </span>
+              )}
+              {cat.id==="vibe" && activeCategory==="vibe" && (
+                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:activeVibeSection==="goodnews"?"#22c55e":activeVibeSection==="funny"?"#f59e0b":"#a855f7", letterSpacing:"0.06em" }}>
+                  {VIBE_SECTIONS.find(s=>s.id===activeVibeSection)?.short}
+                </span>
+              )}
               {cat.id==="saved" && bookmarks.length>0 && <span style={{ background:th.accent, color:night?"#080809":"#fff", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4 }}>{bookmarks.length}</span>}
               {cat.id==="live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>●</span>}
+              {cat.id==="vibe" && <span style={{ background:"rgba(34,197,94,0.15)", color:"#22c55e", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>✨</span>}
             </button>
           ))}
           {!isSaved && !isLive && (
@@ -1900,8 +2040,10 @@ const buildMixed = () => {
         </div>
 
         {/* World region bar — appears below tabs when World is active */}
-        {isWorld && <WorldRegionBar activeRegion={activeRegion} onSelect={handleRegionSelect} th={th} />}
-        {isMedia && <MediaSectionBar activeSection={activeMediaSection} onSelect={handleMediaSectionSelect} th={th} />}
+        {isWorld    && <WorldRegionBar activeRegion={activeRegion} onSelect={handleRegionSelect} th={th} />}
+        {isMedia    && <MediaSectionBar activeSection={activeMediaSection} onSelect={handleMediaSectionSelect} th={th} />}
+        {isBusiness && <BusinessSectionBar activeSection={activeBusinessSection} onSelect={handleBusinessSectionSelect} th={th} />}
+        {isVibe     && <VibeSectionBar activeSection={activeVibeSection} onSelect={handleVibeSectionSelect} th={th} />}
       </header>
 
       {/* ── MAIN ── */}
@@ -1920,11 +2062,20 @@ const buildMixed = () => {
           <div style={{ display:"flex", alignItems:"center", gap:"0.6rem" }}>
             <span style={{ color:isLive?"#ef4444":catAccent, fontSize:"0.85rem" }}>{CATEGORIES.find(c=>c.id===activeCategory)?.icon}</span>
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", fontWeight:700, color:th.textHead, letterSpacing:"-0.01em" }}>
-              {isWorld && activeRegion !== "world" ? currentRegion.label : isMedia ? currentMediaSection.label : CATEGORIES.find(c=>c.id===activeCategory)?.label}
+              {isWorld    && activeRegion !== "world" ? currentRegion.label
+              : isBusiness && activeBusinessSection !== "business" ? currentBusinessSection.label
+              : isVibe     ? currentVibeSection.label
+              : isMedia    ? currentMediaSection.label
+              : CATEGORIES.find(c=>c.id===activeCategory)?.label}
             </h1>
             {isMedia && activeMediaSection === "video" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● LIVE</span>}
             {isMedia && activeMediaSection === "radio" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● ON AIR</span>}
             {isMedia && activeMediaSection === "podcasts" && <span style={{ background:"rgba(96,165,250,0.1)", color:"#60a5fa", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🎙 AUDIO</span>}
+            {isVibe && activeVibeSection === "goodnews" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😊 GOOD VIBES</span>}
+            {isVibe && activeVibeSection === "funny"    && <span style={{ background:"rgba(245,158,11,0.1)", color:"#f59e0b", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😂 FUNNY</span>}
+            {isVibe && activeVibeSection === "weird"    && <span style={{ background:"rgba(168,85,247,0.1)", color:"#a855f7", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🌀 WEIRD</span>}
+            {isBusiness && activeBusinessSection === "stocks" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>📈 MARKETS</span>}
+            {isBusiness && activeBusinessSection === "crypto" && <span style={{ background:"rgba(249,115,22,0.1)", color:"#f97316", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>₿ CRYPTO</span>}
             {trendingFilter && <span style={{ background:th.accentBg, color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", padding:"2px 8px", borderRadius:10 }}>◈ {trendingFilter}</span>}
             {!isSaved && !isLive && !loading && (filteredArticles.length+filteredVideos.length)>0 && (
               <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>
