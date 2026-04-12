@@ -28,8 +28,8 @@ const T = {
 
 // ─── RSS SOURCES ──────────────────────────────────────────────────────────────
 const RSS_SOURCES = {
-  top:      ["https://feeds.bbci.co.uk/news/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml","https://feeds.skynews.com/feeds/rss/home.xml"],
-  world:    ["https://feeds.bbci.co.uk/news/world/rss.xml","https://www.aljazeera.com/xml/rss/all.xml","https://feeds.skynews.com/feeds/rss/world.xml"],
+  top:      ["https://feeds.bbci.co.uk/news/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml","https://www.theguardian.com/world/rss"],
+  world:    ["https://feeds.bbci.co.uk/news/world/rss.xml","https://www.aljazeera.com/xml/rss/all.xml","https://www.theguardian.com/world/rss"],
   europe:   ["https://feeds.bbci.co.uk/news/world/europe/rss.xml","https://rss.dw.com/xml/rss-en-eu","https://feeds.thelocal.com/rss/es","https://feeds.thelocal.com/rss/fr","https://feeds.thelocal.com/rss/it","https://feeds.bbci.co.uk/news/uk/rss.xml","https://www.theguardian.com/uk/rss"],
   americas: ["https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/US.xml","https://feeds.bbci.co.uk/news/world/latin_america/rss.xml","https://en.mercopress.com/rss","https://en.mercopress.com/rss/brazil","https://en.mercopress.com/rss/argentina","https://latinamericanpost.com/feed"],
   // Asia — BBC Asia + SCMP + The Diplomat + Channel NewsAsia + Japan Times + India
@@ -37,20 +37,20 @@ const RSS_SOURCES = {
   // Middle East — BBC + Al Jazeera + DW
   mideast:  ["https://feeds.bbci.co.uk/news/world/middle_east/rss.xml","https://www.aljazeera.com/xml/rss/all.xml","https://rss.dw.com/xml/rss-en-me"],
   tech:     ["https://techcrunch.com/feed/","https://www.wired.com/feed/rss","https://feeds.arstechnica.com/arstechnica/index","https://www.theverge.com/rss/tech/index.xml","https://www.engadget.com/rss.xml","https://www.theguardian.com/us/technology/rss","https://www.reutersagency.com/feed/?best-topics=tech&post_type=best","https://www.tomshardware.com/feeds/all"],
-  business: ["https://feeds.bbci.co.uk/news/business/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/Business.xml","https://feeds.skynews.com/feeds/rss/business.xml","https://www.cnbc.com/id/10001147/device/rss/rss.html","https://feeds.marketwatch.com/marketwatch/topstories/","https://www.ft.com/rss/home","https://www.economist.com/business/rss.xml","https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best","https://www.forbes.com/business/feed/","https://www.investing.com/rss/news_25.rss"],
-  science:  ["https://feeds.bbci.co.uk/news/science_and_environment/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/Science.xml","https://www.theguardian.com/science/rss","https://feeds.feedburner.com/sciencealert-latestnews","https://www.sciencedaily.com/rss/top.xml","https://phys.org/rss-feed/","https://www.zmescience.com/feed/","https://sci.news/feed/"],
+  business: ["https://feeds.bbci.co.uk/news/business/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/Business.xml","https://www.theguardian.com/business/rss"],
+  science:  ["https://feeds.bbci.co.uk/news/science_and_environment/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/Science.xml","https://feeds.feedburner.com/sciencealert-latestnews","https://www.sciencedaily.com/rss/top.xml"],
 
-  sports:   ["https://feeds.bbci.co.uk/sport/rss.xml","https://www.theguardian.com/sport/rss","https://feeds.bbci.co.uk/sport/football/rss.xml","https://soccernews.com/feed","https://worldsoccer.com/feed","https://www.skysports.com/rss/12040","https://www.goal.com/feeds/en/news"],
+  sports:   ["https://feeds.bbci.co.uk/sport/rss.xml","https://www.theguardian.com/sport/rss","https://feeds.bbci.co.uk/sport/football/rss.xml"],
 
 
   cars:     ["https://www.motor1.com/rss/news/all/","https://www.autocar.co.uk/rss","https://electrek.co/feed/","https://www.topgear.com/car-news/rss","https://www.racefans.net/feed/","https://www.autosport.com/rss/f1/news/"],
   motos:    ["https://www.motorcycledaily.com/feed","https://www.rideapart.com/rss/articles/all","https://www.webbikeworld.com/feed","https://www.racefans.net/feed/","https://www.autosport.com/rss/motogp/news/","https://www.motorsport.com/rss/motogp/news/"],
 
 
-  stocks:   ["https://feeds.marketwatch.com/marketwatch/topstories/","https://www.investing.com/rss/news_25.rss","https://www.cnbc.com/id/100003114/device/rss/rss.html","https://www.cnbc.com/id/15839069/device/rss/rss.html","https://feeds.bbci.co.uk/news/business/rss.xml"],
+  stocks:   ["https://feeds.bbci.co.uk/news/business/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/Business.xml","https://www.theguardian.com/business/rss"],
 
 
-  crypto:   ["https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml","https://cointelegraph.com/rss","https://decrypt.co/feed","https://crypto.news/feed","https://news.bitcoin.com/feed"],
+  crypto:   ["https://cointelegraph.com/rss","https://crypto.news/feed","https://news.bitcoin.com/feed"],
 };
 
 // ─── CATEGORY KEYWORD FILTERS ────────────────────────────────────────────────
@@ -201,6 +201,45 @@ const YOUTUBE_SOURCES = {
 };
 
 // ─── WORLD SUB-REGIONS ────────────────────────────────────────────────────────
+// ─── MEDIA SECTIONS ──────────────────────────────────────────────────────────
+const MEDIA_SECTIONS = [
+  { id:"video",    label:"📺 Live Video", short:"Video" },
+  { id:"radio",    label:"📻 Live Radio", short:"Radio" },
+  { id:"podcasts", label:"🎙 Podcasts",   short:"Pods"  },
+];
+
+// ─── RADIO STATIONS ───────────────────────────────────────────────────────────
+const RADIO_STATIONS = [
+  // ── Global English ──────────────────────────────────────────────────────────
+  { id:"bbc",      name:"BBC World Service",  country:"🇬🇧", genre:"Global News",   url:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service" },
+  { id:"npr",      name:"NPR News",           country:"🇺🇸", genre:"US News",       url:"https://npr-ice.streamguys1.com/live.mp3" },
+  { id:"rfi",      name:"RFI English",        country:"🇫🇷", genre:"World News",    url:"https://rfi-enlaces.akacast.akamaistream.net/7/422/470324/v1/gnmedia.akacast.akamaistream.net/rfi_anglais" },
+  { id:"dw",       name:"DW Radio English",   country:"🇩🇪", genre:"World News",    url:"https://icecast.walmradio.com:8443/classic" },
+  { id:"alj",      name:"Al Jazeera Radio",   country:"🇶🇦", genre:"World News",    url:"https://live-hls-web-aja.getaj.net/AJA/index.m3u8" },
+  // ── Spanish ─────────────────────────────────────────────────────────────────
+  { id:"rne",      name:"RNE Radio Nacional", country:"🇪🇸", genre:"España",        url:"https://rne.rtveradio.cires21.com/rne.mp3" },
+  { id:"ser",      name:"Cadena SER",         country:"🇪🇸", genre:"España",        url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CADENASER.mp3" },
+  { id:"cope",     name:"COPE",               country:"🇪🇸", genre:"España",        url:"https://cope.cope.stream.flumotion.com/cope/cope.mp3.m3u" },
+  { id:"ondacero", name:"Onda Cero",          country:"🇪🇸", genre:"España",        url:"https://livefastly-webs.ondacero.es/ondacero/audio/master.m3u8" },
+  // ── Portuguese ──────────────────────────────────────────────────────────────
+  { id:"rfm",      name:"RFM Portugal",       country:"🇵🇹", genre:"Portugal",      url:"https://28563.live.streamtheworld.com/RFM_SC" },
+  { id:"comercial",name:"Rádio Comercial",    country:"🇵🇹", genre:"Portugal",      url:"https://stream-icy.bauermedia.pt/comercial.mp3" },
+  { id:"renascenca",name:"Rádio Renascença", country:"🇵🇹", genre:"Portugal",      url:"https://19593.live.streamtheworld.com/RADIO_RENASCENCA_SC" },
+];
+
+// ─── PODCAST FEEDS ────────────────────────────────────────────────────────────
+const PODCAST_FEEDS = [
+  // Verified podcast RSS feeds with public MP3 enclosures
+  "https://feeds.npr.org/510318/podcast.xml",               // Up First — NPR (Megaphone)
+  "https://podcasts.files.bbci.co.uk/p02nq0gn.rss",        // Global News — BBC
+  "https://feeds.npr.org/500005/podcast.xml",               // NPR News Now
+  "https://feeds.feedburner.com/TEDTalks_audio",            // TED Talks Daily
+  "https://feeds.feedburner.com/TheIndicatorFromPlanetMoney", // The Indicator — Planet Money
+  "https://feeds.megaphone.fm/WWO3519750118",               // Global News Podcast — Monocle
+  "https://rss.art19.com/60-second-science",                // 60-Second Science — Scientific American
+  "https://www.spreaker.com/show/5765785/episodes/feed",    // Reuters World News Daily
+];
+
 const WORLD_REGIONS = [
   { id:"world",    label:"🌐 All World",    short:"All" },
   { id:"europe",   label:"🇪🇺 Europe",      short:"EU" },
@@ -220,7 +259,7 @@ const CATEGORIES = [
   { id:"motos",    label:"Motorcycles",  short:"Motos",   icon:"◍" },
   { id:"stocks",   label:"Stocks",       short:"Stocks",  icon:"📈" },
   { id:"crypto",   label:"Crypto",       short:"Crypto",  icon:"₿" },
-  { id:"live",     label:"Live Video",   short:"Live",    icon:"▶" },
+  { id:"live",     label:"Media",        short:"Media",   icon:"📡" },
   { id:"saved",    label:"Saved",        short:"Saved",   icon:"◆" },
 ];
 
@@ -351,16 +390,14 @@ const WX = {
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
-async function fetchFeed(url) {
+async function fetchFeed(url, delayMs = 0) {
   try {
+    if (delayMs) await new Promise(r => setTimeout(r, delayMs));
     const res = await fetch(`${RSS2JSON}${encodeURIComponent(url)}&count=10`);
-    if (!res.ok) { console.warn(`[RSS] HTTP ${res.status} for ${url}`); return []; }
+    if (!res.ok) return [];
     const data = await res.json();
-    if (data.status !== "ok") { console.warn(`[RSS] status="${data.status}" for ${url}`); return []; }
-    const items = data.items || [];
-    if (items.length === 0) console.warn(`[RSS] 0 items for ${url}`);
-    else console.log(`[RSS] ${items.length} items from ${url}`);
-    return items.map(item => ({
+    if (data.status !== "ok") return [];
+    return (data.items || []).map(item => ({
       id:          item.guid || item.link,
       title:       item.title || "",
       description: stripHtml(item.description || item.content || ""),
@@ -413,6 +450,48 @@ function dedupe(arr) {
 }
 function loadBookmarks() { try { return JSON.parse(localStorage.getItem("theBriefBookmarks") || "[]"); } catch { return []; } }
 function saveBookmarks(bm) { try { localStorage.setItem("theBriefBookmarks", JSON.stringify(bm)); } catch {} }
+
+// ─── PERSISTENT CACHE — 1 HOUR TTL ───────────────────────────────────────────
+const CACHE_TTL   = 60 * 60 * 1000; // 1 hour in ms
+const CACHE_PREFIX = "theBriefCache_";
+
+function loadCached(key) {
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(CACHE_PREFIX + key); return null; }
+    return data;
+  } catch { return null; }
+}
+
+function saveCache(key, data) {
+  try {
+    // Keep localStorage lean — remove oldest entries if we have too many
+    const keys = Object.keys(localStorage).filter(k => k.startsWith(CACHE_PREFIX));
+    if (keys.length > 20) {
+      // Remove the oldest one
+      const oldest = keys.map(k => {
+        try { return { k, ts: JSON.parse(localStorage.getItem(k)).ts }; } catch { return { k, ts:0 }; }
+      }).sort((a,b) => a.ts - b.ts)[0];
+      if (oldest) localStorage.removeItem(oldest.k);
+    }
+    localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ data, ts: Date.now() }));
+  } catch {} // ignore storage quota errors
+}
+
+function clearExpiredCache() {
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith(CACHE_PREFIX))
+      .forEach(k => {
+        try {
+          const { ts } = JSON.parse(localStorage.getItem(k));
+          if (Date.now() - ts > CACHE_TTL) localStorage.removeItem(k);
+        } catch { localStorage.removeItem(k); }
+      });
+  } catch {}
+}
 
 function shareArticle(article, platform = "default") {
   const shareText = `${article.title} — via The Brief`;
@@ -1054,6 +1133,423 @@ function SavedView({ bookmarks, onClick, onBookmark, th }) {
 }
 
 // ─── LIVE VIEW ────────────────────────────────────────────────────────────────
+// ─── MEDIA SECTION BAR ───────────────────────────────────────────────────────
+function MediaSectionBar({ activeSection, onSelect, th }) {
+  return (
+    <div style={{ borderTop:`1px solid ${th.borderTab}`, background:th.bgHeader, overflowX:"auto", scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
+      <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }} className="region-inner">
+        {MEDIA_SECTIONS.map(s => (
+          <button
+            key={s.id}
+            onClick={e => { e.stopPropagation(); onSelect(s.id); }}
+            style={{
+              background:    activeSection===s.id ? th.accentBg : "transparent",
+              border:        `1px solid ${activeSection===s.id ? th.accentBord : th.border}`,
+              color:         activeSection===s.id ? th.accent : th.textMuted,
+              borderRadius:  20,
+              padding:       "0.3rem 0.85rem",
+              cursor:        "pointer",
+              fontFamily:    "'DM Mono',monospace",
+              fontSize:      "0.6rem",
+              letterSpacing: "0.06em",
+              whiteSpace:    "nowrap",
+              transition:    "all 0.18s",
+              flexShrink:    0,
+              minHeight:     34,
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── RADIO VIEW ───────────────────────────────────────────────────────────────
+function RadioView({ th, onPlay }) {
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:"1rem", animation:"fadeIn 0.3s ease" }}>
+      {RADIO_STATIONS.map((station, i) => (
+        <RadioCard key={station.id} station={station} th={th} index={i} onPlay={onPlay} />
+      ))}
+    </div>
+  );
+}
+
+// ─── RADIO CARD ───────────────────────────────────────────────────────────────
+function RadioCard({ station, th, index, onPlay }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => onPlay(station)}
+      style={{
+        background:   hovered ? th.bgCardHover : th.bgCard,
+        border:       `1px solid ${hovered ? th.borderHover : th.border}`,
+        borderRadius: 8,
+        padding:      "1.25rem",
+        cursor:       "pointer",
+        transition:   "all 0.22s ease",
+        transform:    hovered ? "translateY(-2px)" : "none",
+        boxShadow:    hovered ? th.shadow : "none",
+        display:      "flex",
+        alignItems:   "center",
+        gap:          "1rem",
+        animation:    `fadeUp 0.4s ease ${index*0.07}s both`,
+      }}
+    >
+      {/* Pulsing on-air indicator */}
+      <div style={{ position:"relative", flexShrink:0 }}>
+        <div style={{ width:44, height:44, borderRadius:"50%", background:"rgba(239,68,68,0.12)", border:"1px solid rgba(239,68,68,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.3rem" }}>📻</div>
+        <div style={{ position:"absolute", top:2, right:2, width:8, height:8, borderRadius:"50%", background:"#ef4444" }} />
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.3rem" }}>
+          <span style={{ fontSize:"0.85rem" }}>{station.country}</span>
+          <span style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase" }}>{station.genre}</span>
+        </div>
+        <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", fontWeight:700, color:th.textHead, margin:0, lineHeight:1.2 }}>{station.name}</h3>
+      </div>
+      <div style={{ flexShrink:0, color:"#ef4444", fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", display:"flex", flexDirection:"column", alignItems:"center", gap:"0.2rem" }}>
+        <div style={{ width:28, height:28, borderRadius:"50%", background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.8rem" }}>▶</div>
+        <span style={{ fontSize:"0.48rem" }}>PLAY</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── PODCAST VIEW ─────────────────────────────────────────────────────────────
+// Parse podcast RSS XML — works with namespaced itunes tags via getElementsByTagNameNS
+function parsePodcastXML(xml, feedUrl) {
+  try {
+    const parser  = new DOMParser();
+    const doc     = parser.parseFromString(xml, "text/xml");
+    const channel = doc.querySelector("channel");
+    if (!channel) return null;
+
+    // Helper: get text from first matching tag including namespaced ones
+    const getText = (parent, ...tags) => {
+      for (const tag of tags) {
+        const el = parent.getElementsByTagName(tag)[0];
+        if (el?.textContent?.trim()) return el.textContent.trim();
+      }
+      return "";
+    };
+
+    // Podcast-level info
+    const podcastTitle = getText(channel, "title") || new URL(feedUrl).hostname;
+
+    // Artwork: try itunes:image href first, then image/url
+    let image = null;
+    const itunesImg = channel.getElementsByTagName("itunes:image")[0];
+    if (itunesImg) image = itunesImg.getAttribute("href") || null;
+    if (!image) image = getText(channel, "url") || null; // <image><url>
+
+    // Find first item with a valid audio enclosure
+    const items = [...doc.getElementsByTagName("item")];
+    for (const item of items) {
+      // Get enclosure
+      const enc = item.getElementsByTagName("enclosure")[0];
+      const audioUrl = enc?.getAttribute("url") || "";
+      const encType  = enc?.getAttribute("type") || "";
+
+      // Accept if it looks like audio (loose check — many CDNs don't use .mp3 extension)
+      const isAudio = audioUrl && (
+        encType.includes("audio") ||
+        audioUrl.includes(".mp3") ||
+        audioUrl.includes(".m4a") ||
+        audioUrl.includes(".aac") ||
+        audioUrl.includes("audio") ||
+        audioUrl.includes("podcast") ||
+        audioUrl.includes("media") ||
+        audioUrl.includes("download") ||
+        // Megaphone, Simplecast, Acast etc. serve from these domains
+        audioUrl.includes("megaphone") ||
+        audioUrl.includes("simplecast") ||
+        audioUrl.includes("acast") ||
+        audioUrl.includes("buzzsprout") ||
+        audioUrl.includes("podtrac") ||
+        audioUrl.includes("pdst.fm") ||
+        audioUrl.includes("chtbl.com") ||
+        audioUrl.includes("omny") ||
+        audioUrl.includes("npr.org")
+      );
+
+      if (!isAudio) continue;
+
+      const duration   = getText(item, "itunes:duration");
+      const pubDate    = getText(item, "pubDate");
+      const guid       = getText(item, "guid") || audioUrl;
+      const epTitle    = getText(item, "title");
+      const rawDesc    = getText(item, "description", "itunes:summary") || "";
+      const desc       = rawDesc.replace(/<[^>]*>/g, "").replace(/&[^;]+;/g," ").trim().slice(0, 200);
+
+      // Format duration nicely if it's in seconds
+      let dur = duration;
+      if (dur && /^\d+$/.test(dur)) {
+        const s = parseInt(dur);
+        dur = `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+      }
+
+      return {
+        id:          guid,
+        title:       epTitle || podcastTitle,
+        podcast:     podcastTitle,
+        description: desc,
+        mp3:         audioUrl,
+        duration:    dur,
+        publishedAt: pubDate ? new Date(pubDate) : new Date(),
+        image,
+      };
+    }
+    return null;
+  } catch(e) {
+    console.warn("[Podcast parse error]", feedUrl, e);
+    return null;
+  }
+}
+
+async function fetchPodcast(feedUrl) {
+  // Use our own Netlify function — server-side, no CORS issues
+  try {
+    const res = await fetch(`/.netlify/functions/podcast?url=${encodeURIComponent(feedUrl)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.error || !data.mp3) return null;
+    return {
+      id:          data.guid || data.mp3,
+      title:       data.title || "",
+      podcast:     data.podcast || "",
+      description: data.description || "",
+      mp3:         data.mp3,
+      duration:    data.duration || "",
+      publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
+      image:       data.image || null,
+    };
+  } catch { return null; }
+}
+
+function PodcastView({ th, onPlay }) {
+  const [episodes, setEpisodes] = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(false);
+    Promise.allSettled(PODCAST_FEEDS.map(fetchPodcast))
+      .then(results => {
+        const eps = results.map(r => r.value).filter(Boolean);
+        setEpisodes(eps);
+        setLoading(false);
+        if (eps.length === 0) setError(true);
+      });
+  }, []);
+
+  if (loading) return (
+    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:"1rem" }}>
+      {[1,2,3,4,5,6].map(i => (
+        <div key={i} style={{ background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:8, padding:"1.25rem", display:"flex", gap:"1rem", alignItems:"center" }}>
+          <div style={{ width:56, height:56, borderRadius:8, background:th.bgSkeleton1, flexShrink:0 }} />
+          <div style={{ flex:1, display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+            <div style={{ height:10, width:"60%", background:th.bgSkeleton1, borderRadius:3 }} />
+            <div style={{ height:14, background:th.bgSkeleton1, borderRadius:3 }} />
+            <div style={{ height:10, width:"40%", background:th.bgSkeleton1, borderRadius:3 }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (!loading && episodes.length === 0) return (
+    <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em", lineHeight:2 }}>
+      <div style={{ fontSize:"2rem", marginBottom:"1rem" }}>🎙</div>
+      <div>NO EPISODES FOUND</div>
+      <div style={{ fontSize:"0.6rem", marginTop:"0.5rem", opacity:0.6 }}>PODCASTS LOADING MAY TAKE A MOMENT</div>
+    </div>
+  );
+
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:"1rem", animation:"fadeIn 0.3s ease" }}>
+      {episodes.map((ep, i) => (
+        <PodcastCard key={ep.id||i} episode={ep} th={th} index={i} onPlay={onPlay} />
+      ))}
+    </div>
+  );
+}
+
+// ─── PODCAST CARD ─────────────────────────────────────────────────────────────
+function PodcastCard({ episode, th, index, onPlay }) {
+  const [hovered, setHovered] = useState(false);
+  const [imgErr,  setImgErr]  = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => onPlay(episode)}
+      style={{
+        background:   hovered ? th.bgCardHover : th.bgCard,
+        border:       `1px solid ${hovered ? th.borderHover : th.border}`,
+        borderRadius: 8,
+        padding:      "1.25rem",
+        cursor:       "pointer",
+        transition:   "all 0.22s ease",
+        transform:    hovered ? "translateY(-2px)" : "none",
+        boxShadow:    hovered ? th.shadow : "none",
+        display:      "flex",
+        gap:          "1rem",
+        alignItems:   "flex-start",
+        animation:    `fadeUp 0.4s ease ${index*0.07}s both`,
+      }}
+    >
+      {/* Podcast art */}
+      <div style={{ width:56, height:56, borderRadius:8, overflow:"hidden", flexShrink:0, background:th.bgSkeleton1, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.5rem" }}>
+        {episode.image && !imgErr
+          ? <img src={episode.image} alt="" onError={()=>setImgErr(true)} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+          : "🎙"
+        }
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <p style={{ color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:"0.3rem", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{episode.podcast}</p>
+        <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, margin:"0 0 0.4rem", lineHeight:1.25, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{episode.title}</h3>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.6rem" }}>
+          <div style={{ width:24, height:24, borderRadius:"50%", background:th.accentBg, border:`1px solid ${th.accentBord}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.6rem", color:th.accent, flexShrink:0 }}>▶</div>
+          {episode.duration && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>{episode.duration}</span>}
+          <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>{timeAgo(episode.publishedAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MINI PLAYER ─────────────────────────────────────────────────────────────
+function MiniPlayer({ track, onClose, th }) {
+  const audioRef  = useRef(null);
+  const [playing, setPlaying]   = useState(false);
+  const [progress,setProgress]  = useState(0);
+  const [duration,setDuration]  = useState(0);
+  const [volume,  setVolume]    = useState(1);
+  const [speed,   setSpeed]     = useState(1);
+  const [loading, setLoading]   = useState(true);
+  const [error,   setError]     = useState(false);
+  const isPodcast = !!track.mp3;
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    setLoading(true); setError(false); setProgress(0);
+    audio.src = isPodcast ? track.mp3 : track.url;
+    audio.load();
+    const onReady = () => { setLoading(false); audio.play().then(()=>setPlaying(true)).catch(()=>setError(true)); };
+    const onTime  = () => setProgress(audio.currentTime);
+    const onDur   = () => setDuration(audio.duration);
+    const onErr   = () => { setLoading(false); setError(true); };
+    audio.addEventListener("canplay",    onReady);
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("durationchange", onDur);
+    audio.addEventListener("error",      onErr);
+    return () => {
+      audio.removeEventListener("canplay",    onReady);
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("durationchange", onDur);
+      audio.removeEventListener("error",      onErr);
+      audio.pause();
+    };
+  }, [track]);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) { audio.pause(); setPlaying(false); }
+    else { audio.play().then(()=>setPlaying(true)).catch(()=>{}); }
+  };
+
+  const seek = (e) => {
+    if (!isPodcast || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct  = (e.clientX - rect.left) / rect.width;
+    audioRef.current.currentTime = pct * duration;
+  };
+
+  const cycleSpeed = () => {
+    const speeds = [1, 1.25, 1.5, 2, 0.75];
+    const next = speeds[(speeds.indexOf(speed)+1) % speeds.length];
+    setSpeed(next);
+    audioRef.current.playbackRate = next;
+  };
+
+  const fmt = s => { if(!s||isNaN(s)) return "0:00"; const m=Math.floor(s/60); const sec=Math.floor(s%60); return `${m}:${sec.toString().padStart(2,"0")}`; };
+
+  return (
+    <div style={{
+      position:     "fixed",
+      bottom:       0, left:0, right:0,
+      background:   th.bgReader,
+      borderTop:    `1px solid ${th.border}`,
+      zIndex:       200,
+      boxShadow:    "0 -8px 32px rgba(0,0,0,0.35)",
+      animation:    "slideUp 0.25s cubic-bezier(0.16,1,0.3,1)",
+      paddingBottom:"env(safe-area-inset-bottom,0px)",
+    }}>
+      <audio ref={audioRef} preload="auto" />
+
+      {/* Progress bar — clickable for podcasts */}
+      {isPodcast && duration > 0 && (
+        <div onClick={seek} style={{ height:3, background:th.border, cursor:"pointer", position:"relative" }}>
+          <div style={{ height:"100%", width:`${(progress/duration)*100}%`, background:`linear-gradient(90deg,${th.accent},#e8833a)`, transition:"width 0.5s linear" }} />
+        </div>
+      )}
+      {!isPodcast && (
+        <div style={{ height:3, background:`linear-gradient(90deg,${th.accent},#e8833a)`, backgroundSize:"200% 100%", animation:"loadBar 2s ease-in-out infinite" }} />
+      )}
+
+      <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.65rem 1rem", display:"flex", alignItems:"center", gap:"0.75rem" }}>
+        {/* Icon */}
+        <div style={{ width:36, height:36, borderRadius:6, background:th.accentBg, border:`1px solid ${th.accentBord}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.1rem", flexShrink:0 }}>
+          {isPodcast ? "🎙" : "📻"}
+        </div>
+
+        {/* Track info */}
+        <div style={{ flex:1, minWidth:0 }}>
+          <p style={{ color:th.accent, fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", margin:0 }}>
+            {isPodcast ? (track.podcast||"Podcast") : "🔴 LIVE"}
+          </p>
+          <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Playfair Display',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+            {track.name || track.title}
+          </p>
+        </div>
+
+        {/* Time for podcasts */}
+        {isPodcast && duration > 0 && (
+          <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", flexShrink:0 }}>{fmt(progress)} / {fmt(duration)}</span>
+        )}
+
+        {/* Controls */}
+        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", flexShrink:0 }}>
+          {error && <span style={{ color:"#f87171", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>STREAM ERROR</span>}
+          {loading && !error && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", animation:"ping 1s infinite" }}>LOADING…</span>}
+
+          {isPodcast && (
+            <button onClick={cycleSpeed} style={{ background:th.bgInput, border:`1px solid ${th.border}`, color:th.textMuted, borderRadius:4, padding:"3px 7px", cursor:"pointer", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>{speed}x</button>
+          )}
+
+          <button
+            onClick={togglePlay}
+            disabled={loading || error}
+            style={{ width:36, height:36, borderRadius:"50%", background:th.accent, border:"none", color:"#000", cursor:"pointer", fontSize:"1rem", display:"flex", alignItems:"center", justifyContent:"center", transition:"transform 0.15s", opacity: loading||error ? 0.5 : 1 }}
+          >
+            {playing ? "⏸" : "▶"}
+          </button>
+
+          <button onClick={onClose} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, borderRadius:4, padding:"5px 8px", cursor:"pointer", fontSize:"0.75rem" }}>✕</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LiveView({ videos, loading, onPlay, th }) {
   if (loading) return (
     <div className="news-grid">
@@ -1111,6 +1607,7 @@ export default function NewsApp() {
   const [night,           setNight]           = useState(()=>{ try{return localStorage.getItem("theBriefTheme")!=="day";}catch{return true;} });
   const [activeCategory,  setActiveCategory]  = useState("top");
   const [activeRegion,    setActiveRegion]    = useState("world");
+  const [activeMediaSection, setActiveMediaSection] = useState("video");
   const [articles,        setArticles]        = useState([]);
   const [videos,          setVideos]          = useState([]);
   const [loading,         setLoading]         = useState(true);
@@ -1122,12 +1619,16 @@ export default function NewsApp() {
   const [showContact,     setShowContact]     = useState(false);
   const [bookmarks,       setBookmarks]       = useState(loadBookmarks);
   const [showScrollTop,   setShowScrollTop]   = useState(false);
+  const [nowPlaying,      setNowPlaying]      = useState(null);
   const [trendingFilter,  setTrendingFilter]  = useState(null);
   const [newStoryCount,   setNewStoryCount]   = useState(0);
   const prevTopArticleRef = useRef(null);
   const cacheRef = useRef({});
   const th = night ? T.night : T.day;
   const weather = useWeather();
+
+  // Clear expired localStorage cache on mount
+  useEffect(() => { clearExpiredCache(); }, []);
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -1160,10 +1661,24 @@ export default function NewsApp() {
 
   const loadNews = useCallback(async (key) => {
     if (key === "saved") return;
+
+    // 1. Check in-memory cache first (fastest — same session)
     if (cacheRef.current[key]) {
-      if (key==="live") { setVideos(cacheRef.current[key]); } else { setArticles(cacheRef.current[key].articles||[]); setVideos(cacheRef.current[key].videos||[]); }
+      if (key==="live") { setVideos(cacheRef.current[key]); }
+      else { setArticles(cacheRef.current[key].articles||[]); setVideos(cacheRef.current[key].videos||[]); }
       setLoading(false); return;
     }
+
+    // 2. Check localStorage cache (survives page refresh, 1hr TTL)
+    const persisted = loadCached(key);
+    if (persisted) {
+      cacheRef.current[key] = persisted; // also warm in-memory cache
+      if (key==="live") { setVideos(persisted); }
+      else { setArticles(persisted.articles||[]); setVideos(persisted.videos||[]); }
+      setLoading(false); return;
+    }
+
+    // 3. Fetch fresh from RSS feeds
     setLoading(true); setError(null);
     try {
       if (key === "live") {
@@ -1171,30 +1686,27 @@ export default function NewsApp() {
         const all = results.flatMap(r=>r.status==="fulfilled"?r.value:[]);
         const sorted = dedupe(all).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
         cacheRef.current[key] = sorted;
+        saveCache(key, sorted);
         setVideos(sorted); setArticles([]);
       } else {
         const [artRes, vidRes] = await Promise.all([
-          Promise.allSettled((RSS_SOURCES[key]||[]).map(fetchFeed)),
+          Promise.allSettled((RSS_SOURCES[key]||[]).map((url, i) => fetchFeed(url, i * 300))),
           Promise.allSettled((YOUTUBE_SOURCES[key]||[]).map(fetchYouTubeFeed)),
         ]);
         const allArt = artRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
         const allVid = vidRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
-        // Apply category keyword filter — blocks off-topic articles
-        // Soft-filter categories: if the filter blocks everything, fall back to unfiltered
-        // Science is included because headlines are too varied to guarantee keyword matches
         const SOFT_FILTER_CATEGORIES = new Set(["cars","stocks","crypto","science","sports","motos","tech","business"]);
-
         let filteredArt = allArt.filter(a => passesFilter(a, key));
-
         if (SOFT_FILTER_CATEGORIES.has(key) && filteredArt.length < 3) {
-          filteredArt = allArt; // fallback — show all if filter is too aggressive
+          filteredArt = allArt;
         }
         const sortedArt = dedupe(filteredArt).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
         const sortedVid = dedupe(allVid).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt)).slice(0,4);
         if (!sortedArt.length && !sortedVid.length) throw new Error("No content found. Check your connection.");
-        cacheRef.current[key] = { articles:sortedArt, videos:sortedVid };
+        const payload = { articles:sortedArt, videos:sortedVid };
+        cacheRef.current[key] = payload;
+        saveCache(key, payload); // persist to localStorage for 1hr
         setArticles(sortedArt); setVideos(sortedVid);
-        // Breaking news badge — detect new top story
         if (key === "top" && sortedArt.length) {
           const topId = sortedArt[0].id;
           if (prevTopArticleRef.current && prevTopArticleRef.current !== topId) {
@@ -1219,10 +1731,15 @@ export default function NewsApp() {
     setSearch("");
     scrollToTop();
     if (id !== "world") setActiveRegion("world");
+    if (id !== "live")  setActiveMediaSection("video");
   };
   const handleRegionSelect = (regionId) => {
     setActiveRegion(regionId);
     setSearch("");
+    scrollToTop();
+  };
+  const handleMediaSectionSelect = (sectionId) => {
+    setActiveMediaSection(sectionId);
     scrollToTop();
   };
 
@@ -1273,10 +1790,12 @@ const buildMixed = () => {
   };
   const { featured, mixed } = buildMixed();
   const breakingArticle = articles[0] || null;
-  const isLive  = activeCategory === "live";
-  const isSaved = activeCategory === "saved";
-  const isWorld = activeCategory === "world";
+  const isMedia  = activeCategory === "live";
+  const isLive   = activeCategory === "live"; // keep for backward compat
+  const isSaved  = activeCategory === "saved";
+  const isWorld  = activeCategory === "world";
   const currentRegion = WORLD_REGIONS.find(r=>r.id===activeRegion) || WORLD_REGIONS[0];
+  const currentMediaSection = MEDIA_SECTIONS.find(s=>s.id===activeMediaSection) || MEDIA_SECTIONS[0];
 
   return (
     <div style={{ minHeight:"100vh", background:th.bg, color:th.text, fontFamily:"'Lora',serif", transition:"background 0.3s, color 0.3s", overflowX:"hidden", width:"100%" }}>
@@ -1370,11 +1889,11 @@ const buildMixed = () => {
                 </span>
               )}
               {cat.id==="saved" && bookmarks.length>0 && <span style={{ background:th.accent, color:night?"#080809":"#fff", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4 }}>{bookmarks.length}</span>}
-              {cat.id==="live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>LIVE</span>}
+              {cat.id==="live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>●</span>}
             </button>
           ))}
           {!isSaved && !isLive && (
-            <button onClick={()=>{ delete cacheRef.current[feedKey]; loadNews(feedKey); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textFaint, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
+            <button onClick={()=>{ delete cacheRef.current[feedKey]; localStorage.removeItem("theBriefCache_"+feedKey); loadNews(feedKey); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textFaint, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
               ↺ <span className="cat-label cat-full" style={{ fontSize:"0.55rem", letterSpacing:"0.12em" }}>REFRESH</span>
             </button>
           )}
@@ -1382,6 +1901,7 @@ const buildMixed = () => {
 
         {/* World region bar — appears below tabs when World is active */}
         {isWorld && <WorldRegionBar activeRegion={activeRegion} onSelect={handleRegionSelect} th={th} />}
+        {isMedia && <MediaSectionBar activeSection={activeMediaSection} onSelect={handleMediaSectionSelect} th={th} />}
       </header>
 
       {/* ── MAIN ── */}
@@ -1400,9 +1920,11 @@ const buildMixed = () => {
           <div style={{ display:"flex", alignItems:"center", gap:"0.6rem" }}>
             <span style={{ color:isLive?"#ef4444":catAccent, fontSize:"0.85rem" }}>{CATEGORIES.find(c=>c.id===activeCategory)?.icon}</span>
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", fontWeight:700, color:th.textHead, letterSpacing:"-0.01em" }}>
-              {isWorld && activeRegion !== "world" ? currentRegion.label : CATEGORIES.find(c=>c.id===activeCategory)?.label}
+              {isWorld && activeRegion !== "world" ? currentRegion.label : isMedia ? currentMediaSection.label : CATEGORIES.find(c=>c.id===activeCategory)?.label}
             </h1>
-            {isLive && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● LIVE</span>}
+            {isMedia && activeMediaSection === "video" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● LIVE</span>}
+            {isMedia && activeMediaSection === "radio" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● ON AIR</span>}
+            {isMedia && activeMediaSection === "podcasts" && <span style={{ background:"rgba(96,165,250,0.1)", color:"#60a5fa", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🎙 AUDIO</span>}
             {trendingFilter && <span style={{ background:th.accentBg, color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", padding:"2px 8px", borderRadius:10 }}>◈ {trendingFilter}</span>}
             {!isSaved && !isLive && !loading && (filteredArticles.length+filteredVideos.length)>0 && (
               <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>
@@ -1414,7 +1936,9 @@ const buildMixed = () => {
         </div>
 
         {isSaved && <SavedView bookmarks={bookmarks} onClick={setSelectedArticle} onBookmark={toggleBookmark} th={th} />}
-        {isLive  && <LiveView videos={filteredVideos} loading={loading} onPlay={setSelectedVideo} th={th} />}
+        {isMedia && activeMediaSection === "video"    && <LiveView videos={filteredVideos} loading={loading} onPlay={setSelectedVideo} th={th} />}
+        {isMedia && activeMediaSection === "radio"    && <RadioView th={th} onPlay={setNowPlaying} />}
+        {isMedia && activeMediaSection === "podcasts" && <PodcastView th={th} onPlay={setNowPlaying} />}
 
         {!isSaved && !isLive && error && (
           <div style={{ background:"rgba(239,68,68,0.06)", border:"1px solid rgba(239,68,68,0.18)", borderRadius:5, padding:"2rem", textAlign:"center" }}>
@@ -1527,13 +2051,16 @@ const buildMixed = () => {
         </div>
       </footer>
 
+      {/* ── MINI PLAYER ── */}
+      {nowPlaying && <MiniPlayer track={nowPlaying} onClose={()=>setNowPlaying(null)} th={th} />}
+
       {/* ── SCROLL TO TOP ── */}
       {showScrollTop && (
-        <button onClick={scrollToTop} title="Back to top" style={{ position:"fixed", bottom:"5.5rem", right:"1.5rem", background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:"50%", width:42, height:42, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:90, boxShadow:th.shadow, fontSize:"1rem", color:th.textMuted, transition:"all 0.2s", animation:"fadeIn 0.25s ease" }} onMouseEnter={e=>{e.currentTarget.style.background=th.accentBg;e.currentTarget.style.color=th.accent;e.currentTarget.style.borderColor=th.accentBord;e.currentTarget.style.transform="translateY(-2px)";}} onMouseLeave={e=>{e.currentTarget.style.background=th.bgCard;e.currentTarget.style.color=th.textMuted;e.currentTarget.style.borderColor=th.border;e.currentTarget.style.transform="none";}}>↑</button>
+        <button onClick={scrollToTop} title="Back to top" style={{ position:"fixed", bottom: nowPlaying ? "8rem" : "5.5rem", right:"1.5rem", background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:"50%", width:42, height:42, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:90, boxShadow:th.shadow, fontSize:"1rem", color:th.textMuted, transition:"all 0.2s", animation:"fadeIn 0.25s ease" }} onMouseEnter={e=>{e.currentTarget.style.background=th.accentBg;e.currentTarget.style.color=th.accent;e.currentTarget.style.borderColor=th.accentBord;e.currentTarget.style.transform="translateY(-2px)";}} onMouseLeave={e=>{e.currentTarget.style.background=th.bgCard;e.currentTarget.style.color=th.textMuted;e.currentTarget.style.borderColor=th.border;e.currentTarget.style.transform="none";}}>↑</button>
       )}
 
       {/* ── CONTACT BUTTON ── */}
-      <button onClick={()=>setShowContact(c=>!c)} title="Contact Pedro Esteves" style={{ position:"fixed", bottom:"1.5rem", right:"1.5rem", background:th.accent, border:"none", borderRadius:"50%", width:48, height:48, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:90, boxShadow:"0 4px 20px rgba(0,0,0,0.3)", fontSize:"1.1rem", transition:"transform 0.2s, box-shadow 0.2s" }} onMouseEnter={e=>{e.currentTarget.style.transform="scale(1.1)";e.currentTarget.style.boxShadow="0 8px 28px rgba(0,0,0,0.4)";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.3)";}}>✉</button>
+      <button onClick={()=>setShowContact(c=>!c)} title="Contact Pedro Esteves" style={{ position:"fixed", bottom: nowPlaying ? "5rem" : "1.5rem", right:"1.5rem", background:th.accent, border:"none", borderRadius:"50%", width:48, height:48, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:90, boxShadow:"0 4px 20px rgba(0,0,0,0.3)", fontSize:"1.1rem", transition:"transform 0.2s, box-shadow 0.2s" }} onMouseEnter={e=>{e.currentTarget.style.transform="scale(1.1)";e.currentTarget.style.boxShadow="0 8px 28px rgba(0,0,0,0.4)";}} onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.3)";}}>✉</button>
 
       {showContact     && <ContactPopup onClose={()=>setShowContact(false)} th={th} />}
       {selectedArticle && <ReaderPanel article={selectedArticle} onClose={()=>setSelectedArticle(null)} th={th} bookmarks={bookmarks} onBookmark={toggleBookmark} allArticles={articles} onSelectRelated={a=>{setSelectedArticle(a);scrollToTop();}} />}
