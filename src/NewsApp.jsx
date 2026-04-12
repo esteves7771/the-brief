@@ -204,10 +204,13 @@ function saveBookmarks(bm) {
   try { localStorage.setItem("theBriefBookmarks", JSON.stringify(bm)); } catch {}
 }
 function shareArticle(article) {
+  const shareText = `${article.title} — via The Brief`;
+  const shareUrl  = "https://thebriefnews.org";
   if (navigator.share) {
-    navigator.share({ title: article.title, url: article.url }).catch(() => {});
+    navigator.share({ title: shareText, text: shareText, url: shareUrl }).catch(() => {});
   } else {
-    navigator.clipboard?.writeText(article.url).catch(() => {});
+    navigator.clipboard?.writeText(`${shareText}
+${shareUrl}`).catch(() => {});
   }
 }
 
@@ -772,9 +775,19 @@ export default function NewsApp() {
   const [search,          setSearch]          = useState("");
   const [showContact,     setShowContact]     = useState(false);
   const [bookmarks,       setBookmarks]       = useState(loadBookmarks);
+  const [showScrollTop,   setShowScrollTop]   = useState(false);
   const cacheRef = useRef({});
   const th = night ? T.night : T.day;
   const weather = useWeather();
+
+  // Show/hide scroll-to-top button
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const toggleTheme = () => setNight(n => { const next=!n; try{localStorage.setItem("theBriefTheme",next?"night":"day");}catch{} return next; });
 
@@ -921,7 +934,7 @@ export default function NewsApp() {
         {/* Category tabs */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:0, overflowX:"auto", borderTop:`1px solid ${th.borderTab}`, scrollbarWidth:"none" }}>
           {CATEGORIES.map(cat => (
-            <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setSearch(""); }} className="cat-tab" style={{
+            <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setSearch(""); scrollToTop(); }} className="cat-tab" style={{
               background:"transparent", border:"none",
               borderBottom:`2px solid ${activeCategory===cat.id?th.accent:"transparent"}`,
               color:activeCategory===cat.id?th.accent:th.textMuted,
@@ -1032,6 +1045,7 @@ export default function NewsApp() {
               { title:"Cars", desc:"Automotive news, reviews and videos from Autocar, Top Gear, Carwow and Car and Driver." },
               { title:"Motorcycles", desc:"Motorcycle news and videos from Motorcycle Daily, RideApart, FortNine and RevZilla." },
               { title:"Live Video", desc:"Live breaking news videos from BBC News, Al Jazeera, Reuters, DW News and AP News." },
+              { title:"Political Bias Ratings", desc:"Every article source is rated by AllSides Media Bias Ratings. Blue dot = Left leaning. Grey dot = Centre. Red dot = Right leaning. Hover any dot to see the rating." },
             ].map(cat => (
               <div key={cat.title} style={{ padding:"1rem", background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:6 }}>
                 <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.4rem" }}>{cat.title}</h3>
@@ -1052,13 +1066,84 @@ export default function NewsApp() {
         </div>
       </section>
 
+      {/* ── BIAS LEGEND ── */}
+      <div style={{ borderTop:`1px solid ${th.borderSub}`, padding:"1.5rem 1rem", transition:"background 0.3s" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"1rem", letterSpacing:"-0.01em" }}>
+            Political Bias Ratings
+          </h3>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:"1rem", marginBottom:"0.75rem" }}>
+            {[
+              { color:"#3b82f6", label:"Left",        desc:"Strongly left-leaning perspective" },
+              { color:"#60a5fa", label:"Lean Left",   desc:"Slightly left of centre" },
+              { color:"#9ca3af", label:"Centre",      desc:"Balanced, non-partisan coverage" },
+              { color:"#f87171", label:"Lean Right",  desc:"Slightly right of centre" },
+              { color:"#ef4444", label:"Right",       desc:"Strongly right-leaning perspective" },
+            ].map(b => (
+              <div key={b.label} style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
+                <div style={{ width:10, height:10, borderRadius:"50%", background:b.color, flexShrink:0 }} />
+                <div>
+                  <span style={{ color:th.textHead, fontSize:"0.72rem", fontFamily:"'DM Mono',monospace", fontWeight:500 }}>{b.label}</span>
+                  <span style={{ color:th.textMuted, fontSize:"0.65rem", fontFamily:"'Lora',serif", marginLeft:"0.4rem" }}>— {b.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ color:th.textFaint, fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em" }}>
+            Bias ratings sourced from{" "}
+            <a href="https://www.allsides.com" target="_blank" rel="noopener noreferrer" style={{ color:th.accent, textDecoration:"none" }}>AllSides.com</a>
+            {" "}— an independent non-partisan media bias resource.
+          </p>
+        </div>
+      </div>
+
       {/* ── FOOTER ── */}
-      <footer style={{ borderTop:`1px solid ${th.borderSub}`, padding:"1.5rem 1rem", transition:"color 0.3s" }}>
-        <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"0.4rem", textAlign:"center" }}>
-          <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600, letterSpacing:"0.05em" }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
-          <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
+      <footer style={{ borderTop:`1px solid ${th.borderSub}`, padding:"2rem 1rem", transition:"color 0.3s" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"1rem", textAlign:"center" }}>
+          {/* Product Hunt Badge */}
+          <a
+            href="https://www.producthunt.com/products/the-brief-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-the-brief-4"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display:"inline-block", transition:"opacity 0.2s" }}
+            onMouseEnter={e=>e.currentTarget.style.opacity="0.85"}
+            onMouseLeave={e=>e.currentTarget.style.opacity="1"}
+          >
+            <img
+              alt="The Brief - Free live news aggregator - no account, no tracking | Product Hunt"
+              width="200"
+              height="43"
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1121244&theme=dark&t=1775992143795"
+              style={{ display:"block" }}
+            />
+          </a>
+          <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
+            <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600, letterSpacing:"0.05em" }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
+            <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
+          </div>
         </div>
       </footer>
+
+      {/* ── FLOATING SCROLL TO TOP ── */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          title="Back to top"
+          style={{
+            position:"fixed", bottom:"5.5rem", right:"1.5rem",
+            background:th.bgCard, border:`1px solid ${th.border}`,
+            borderRadius:"50%", width:42, height:42,
+            display:"flex", alignItems:"center", justifyContent:"center",
+            cursor:"pointer", zIndex:90,
+            boxShadow:th.shadow,
+            fontSize:"1rem", color:th.textMuted,
+            transition:"all 0.2s",
+            animation:"fadeIn 0.25s ease",
+          }}
+          onMouseEnter={e=>{ e.currentTarget.style.background=th.accentBg; e.currentTarget.style.color=th.accent; e.currentTarget.style.borderColor=th.accentBord; e.currentTarget.style.transform="translateY(-2px)"; }}
+          onMouseLeave={e=>{ e.currentTarget.style.background=th.bgCard; e.currentTarget.style.color=th.textMuted; e.currentTarget.style.borderColor=th.border; e.currentTarget.style.transform="none"; }}
+        >↑</button>
+      )}
 
       {/* ── FLOATING CONTACT ── */}
       <button onClick={() => setShowContact(c=>!c)} title="Contact Pedro Esteves" style={{ position:"fixed", bottom:"1.5rem", right:"1.5rem", background:th.accent, border:"none", borderRadius:"50%", width:48, height:48, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:90, boxShadow:"0 4px 20px rgba(0,0,0,0.3)", fontSize:"1.1rem", transition:"transform 0.2s, box-shadow 0.2s" }} onMouseEnter={e=>{ e.currentTarget.style.transform="scale(1.1)"; e.currentTarget.style.boxShadow="0 8px 28px rgba(0,0,0,0.4)"; }} onMouseLeave={e=>{ e.currentTarget.style.transform="scale(1)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.3)"; }}>✉</button>
