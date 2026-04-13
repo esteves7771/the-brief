@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — The Brief</title>
+  <meta name="description" content="Get in touch with The Brief. We'd love to hear your feedback, suggestions or questions." />
+  <link rel="canonical" href="https://thebriefnews.org/contact.html" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #080809;
+      color: #f1f5f9;
+      font-family: Georgia, serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .wordmark a {
+      text-decoration: none;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .wordmark .the  { color: #f8fafc; }
+    .wordmark .brief { color: #f5c550; }
+    .wordmark .live { font-family: monospace; font-size: 0.5rem; color: #64748b; letter-spacing: 0.2em; margin-left: 0.3rem; text-transform: uppercase; }
+    main {
+      max-width: 640px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #f8fafc;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+    .accent { color: #f5c550; }
+    .subtitle {
+      color: #64748b;
+      font-size: 0.9rem;
+      font-family: monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f5c550;
+      margin-bottom: 0.75rem;
+      font-family: monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .card p {
+      color: #94a3b8;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+    .card a {
+      color: #f5c550;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(245,197,80,0.3);
+      transition: border-color 0.2s;
+    }
+    .card a:hover { border-color: #f5c550; }
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #64748b;
+      text-decoration: none;
+      font-family: monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 2rem;
+      transition: color 0.2s;
+    }
+    .back:hover { color: #f5c550; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #334155;
+      font-size: 0.75rem;
+      font-family: monospace;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wordmark">
+      <a href="/">
+        <span class="the">The</span><span class="brief">Brief</span><span class="live">Live</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <p class="subtitle">Get in touch</p>
+    <h1>Contact <span class="accent">Us</span></h1>
+
+    <div class="card">
+      <h2>📧 Email</h2>
+      <p>Have feedback, a suggestion, or spotted a broken feed? We'd love to hear from you.<br><br>
+      Reach us at <a href="mailto:pedro.esteves.pt@proton.me">pedro.esteves.pt@proton.me</a></p>
+    </div>
+
+    <div class="card">
+      <h2>🐛 Report an Issue</h2>
+      <p>If a category is showing no stories, a feed is broken, or something looks wrong — please let us know via email and we'll fix it as quickly as possible.</p>
+    </div>
+
+    <div class="card">
+      <h2>💡 Suggest a Source</h2>
+      <p>Know a great news source we should add? We're always looking to expand our coverage. Send us the RSS feed URL and we'll review it.</p>
+    </div>
+
+    <div class="card">
+      <h2>🤝 About The Brief</h2>
+      <p>The Brief is a free, independent news aggregator built by one developer in Barcelona. No ads (yet), no tracking, no account required. Just news.<br><br>
+      Built with React, Netlify and a lot of coffee. ☕</p>
+    </div>
+
+    <a href="/" class="back">← Back to The Brief</a>
+  </main>
+
+  <footer>
+    © 2026 The Brief · <a href="/privacy.html" style="color:#64748b">Privacy Policy</a> · <a href="/about.html" style="color:#64748b">About</a> · thebriefnews.org
+  </footer>
+</body>
+</html>
