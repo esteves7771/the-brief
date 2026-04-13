@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — The Brief</title>
+  <meta name="description" content="The Brief is a free live news aggregator built by one developer in Barcelona. No account, no tracking, no ads." />
+  <link rel="canonical" href="https://thebriefnews.org/about.html" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background:#080809; color:#f1f5f9; font-family:Georgia,serif; min-height:100vh; -webkit-font-smoothing:antialiased; }
+    header { border-bottom:1px solid rgba(255,255,255,0.07); padding:1rem 2rem; }
+    .wordmark a { text-decoration:none; font-size:1.4rem; font-weight:800; letter-spacing:-0.03em; }
+    .wordmark .the { color:#f8fafc; }
+    .wordmark .brief { color:#f5c550; }
+    .wordmark .live { font-family:monospace; font-size:0.5rem; color:#64748b; letter-spacing:0.2em; margin-left:0.3rem; text-transform:uppercase; }
+    main { max-width:640px; margin:4rem auto; padding:0 2rem; }
+    h1 { font-size:2rem; font-weight:800; color:#f8fafc; margin-bottom:0.5rem; letter-spacing:-0.03em; }
+    .accent { color:#f5c550; }
+    .subtitle { color:#64748b; font-size:0.9rem; font-family:monospace; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:2.5rem; }
+    .card { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:2rem; margin-bottom:1.5rem; }
+    .card h2 { font-size:1rem; font-weight:700; color:#f5c550; margin-bottom:0.75rem; font-family:monospace; letter-spacing:0.1em; text-transform:uppercase; }
+    .card p { color:#94a3b8; line-height:1.7; font-size:0.95rem; margin-bottom:0.75rem; }
+    .card p:last-child { margin-bottom:0; }
+    .card a { color:#f5c550; text-decoration:none; border-bottom:1px solid rgba(245,197,80,0.3); }
+    .card a:hover { border-color:#f5c550; }
+    .sources { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
+    .source-tag { background:rgba(245,197,80,0.08); border:1px solid rgba(245,197,80,0.2); color:#f5c550; font-family:monospace; font-size:0.6rem; letter-spacing:0.1em; padding:3px 8px; border-radius:4px; text-transform:uppercase; }
+    .back { display:inline-flex; align-items:center; gap:0.4rem; color:#64748b; text-decoration:none; font-family:monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; margin-top:2rem; transition:color 0.2s; }
+    .back:hover { color:#f5c550; }
+    footer { text-align:center; padding:2rem; color:#334155; font-size:0.75rem; font-family:monospace; border-top:1px solid rgba(255,255,255,0.04); margin-top:4rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wordmark"><a href="/"><span class="the">The</span><span class="brief">Brief</span><span class="live">Live</span></a></div>
+  </header>
+
+  <main>
+    <p class="subtitle">Our story</p>
+    <h1>About <span class="accent">The Brief</span></h1>
+
+    <div class="card">
+      <h2>📰 What is The Brief?</h2>
+      <p>The Brief is a free, open live news aggregator that brings together breaking stories, live video, live radio and podcasts in one clean, fast interface.</p>
+      <p>No account required. No paywalls. No tracking. No ads (yet). Just news from the sources you trust, updated continuously.</p>
+    </div>
+
+    <div class="card">
+      <h2>🌍 Coverage</h2>
+      <p>12 categories including Top Stories, World, Tech, Business, Science, Sports, Cars, Motorcycles, Stocks, Crypto, Vibe (Good News / Funny / Weird) and Media.</p>
+      <p>World news broken down by region: Europe, Asia, Americas and Middle East.</p>
+      <p>Sources include:</p>
+      <div class="sources">
+        <span class="source-tag">BBC</span>
+        <span class="source-tag">New York Times</span>
+        <span class="source-tag">The Guardian</span>
+        <span class="source-tag">Al Jazeera</span>
+        <span class="source-tag">Reuters</span>
+        <span class="source-tag">TechCrunch</span>
+        <span class="source-tag">Wired</span>
+        <span class="source-tag">Ars Technica</span>
+        <span class="source-tag">The Verge</span>
+        <span class="source-tag">DW</span>
+        <span class="source-tag">NHK</span>
+        <span class="source-tag">CoinTelegraph</span>
+        <span class="source-tag">ScienceDaily</span>
+        <span class="source-tag">20+ more</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📡 Media Hub</h2>
+      <p>Beyond articles, The Brief includes a full Media tab with live video news from BBC, Al Jazeera, DW, Reuters and AP — live radio from 13 stations across 5 countries — and the latest podcast episodes from NPR, BBC, TED and more.</p>
+      <p>A persistent mini-player lets you keep listening while you browse.</p>
+    </div>
+
+    <div class="card">
+      <h2>🔒 Privacy first</h2>
+      <p>The Brief does not collect any personal data, require registration, or track your reading habits. All content is fetched from public RSS feeds and YouTube channels.</p>
+      <p>Your preferences (theme, bookmarks) are stored only in your own browser's localStorage — never on our servers.</p>
+    </div>
+
+    <div class="card">
+      <h2>👨‍💻 Built by</h2>
+      <p>The Brief was built by <strong style="color:#f8fafc">Pedro Esteves</strong>, a frontend developer and digital trust & safety professional based in Barcelona, Spain.</p>
+      <p>Built with React, Netlify serverless functions and a genuine frustration at having 15 browser tabs open just to read the news.</p>
+      <p>Questions or feedback? <a href="/contact.html">Get in touch</a>.</p>
+    </div>
+
+    <a href="/" class="back">← Back to The Brief</a>
+  </main>
+
+  <footer>
+    © 2026 The Brief · <a href="/contact.html" style="color:#64748b">Contact</a> · <a href="/privacy.html" style="color:#64748b">Privacy Policy</a> · thebriefnews.org
+  </footer>
+</body>
+</html>
