@@ -328,7 +328,7 @@ const CATEGORIES = [
   { id:"saved",    label:"Saved",       short:"Saved", icon:"◆" },
 ];
 
-const RSS2JSON     = "https://api.rss2json.com/v1/api.json?rss_url=";
+const RSS_PROXY = "/.netlify/functions/rss?url="; // our own proxy — no rate limits
 const CONTACT_EMAIL = "pedro.esteves.pt@proton.me";
 
 // ─── POLITICAL BIAS LOOKUP ────────────────────────────────────────────────────
@@ -458,17 +458,19 @@ const WX = {
 async function fetchFeed(url, delayMs = 0) {
   try {
     if (delayMs) await new Promise(r => setTimeout(r, delayMs));
-    const res = await fetch(`${RSS2JSON}${encodeURIComponent(url)}&count=10`);
+    const res = await fetch(`${RSS_PROXY}${encodeURIComponent(url)}&count=10`);
     if (!res.ok) return [];
     const data = await res.json();
     if (data.status !== "ok") return [];
-    return (data.items || []).map(item => ({
-      id:          item.guid || item.link,
+    // Map our proxy response — field names match rss.js output
+    const feedTitle = data.feed?.title || new URL(url).hostname.replace("www.", "");
+    return (data.feed?.items || []).map(item => ({
+      id:          item.guid || item.link || item.title,
       title:       item.title || "",
-      description: stripHtml(item.description || item.content || ""),
+      description: item.description || "",
       url:         item.link || "",
-      image:       item.thumbnail || item.enclosure?.link || extractImage(item.description) || null,
-      source:      data.feed?.title || new URL(url).hostname.replace("www.",""),
+      image:       item.image || extractImage(item.description) || null,
+      source:      feedTitle,
       publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
       type:        "article",
     }));
@@ -1803,7 +1805,7 @@ export default function NewsApp() {
         setVideos(sorted); setArticles([]);
       } else {
         const [artRes, vidRes] = await Promise.all([
-          Promise.allSettled((RSS_SOURCES[key]||[]).map((url, i) => fetchFeed(url, i * 300))),
+          Promise.allSettled((RSS_SOURCES[key]||[]).map(url => fetchFeed(url))),
           Promise.allSettled((YOUTUBE_SOURCES[key]||[]).map(fetchYouTubeFeed)),
         ]);
         const allArt = artRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
@@ -2199,6 +2201,15 @@ const buildMixed = () => {
           </a>
           <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600 }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
           <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
+          <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap", justifyContent:"center" }}>
+            {[["About", "/about.html"], ["Contact", "/contact.html"], ["Privacy Policy", "/privacy.html"]].map(([label, href]) => (
+              <a key={href} href={href} style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", textDecoration:"none", textTransform:"uppercase", transition:"color 0.2s" }}
+                onMouseEnter={e=>e.currentTarget.style.color=th.accent}
+                onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
+                {label}
+              </a>
+            ))}
+          </div>
         </div>
       </footer>
 
