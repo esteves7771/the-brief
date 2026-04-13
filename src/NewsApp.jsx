@@ -8,8 +8,8 @@ const T = {
     bgSkeleton1:"rgba(255,255,255,0.04)", bgSkeleton2:"rgba(255,255,255,0.08)",
     border:"rgba(255,255,255,0.07)", borderHover:"rgba(245,197,80,0.28)",
     borderSub:"rgba(255,255,255,0.05)", borderTab:"rgba(255,255,255,0.04)",
-    text:"#f1f5f9", textHead:"#f8fafc", textBody:"#4a5568", textMuted:"#334155",
-    textFaint:"#1e293b", textSource:"#64748b", accent:"#f5c550",
+    text:"#f1f5f9", textHead:"#f8fafc", textBody:"#94a3b8", textMuted:"#64748b",
+    textFaint:"#334155", textSource:"#94a3b8", accent:"#f5c550",
     accentBg:"rgba(245,197,80,0.10)", accentBord:"rgba(245,197,80,0.28)",
     shadow:"0 12px 40px rgba(0,0,0,0.55)", scrollThumb:"rgba(255,255,255,0.1)", footer:"#2a3547",
   },
@@ -41,8 +41,44 @@ const RSS_SOURCES = {
   science:  ["https://feeds.bbci.co.uk/news/science_and_environment/rss.xml","https://rss.nytimes.com/services/xml/rss/nyt/Science.xml","https://feeds.feedburner.com/sciencealert-latestnews","https://www.sciencedaily.com/rss/top.xml"],
 
   sports:   ["https://feeds.bbci.co.uk/sport/rss.xml","https://www.theguardian.com/sport/rss","https://feeds.bbci.co.uk/sport/football/rss.xml"],
+  // ⚽ Football sub-section — major European leagues
+  football: [
+    "https://feeds.bbci.co.uk/sport/football/rss.xml",           // BBC Football
+    "https://www.theguardian.com/football/rss",                   // Guardian Football
+    "https://feeds.bbci.co.uk/sport/football/premier-league/rss.xml", // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League
+    "https://feeds.bbci.co.uk/sport/football/european/rss.xml",  // Champions League
+    "https://www.marca.com/rss/futbol/primera-division.xml",      // 🇪🇸 La Liga
+    "https://as.com/rss/tags/laliga.xml",                         // 🇪🇸 La Liga alt
+    "https://www.goal.com/feeds/en/news",                         // 🌍 Goal.com
+    "https://www.skysports.com/rss/12040",                        // Sky Sports Football
+  ],
 
 
+  // 🏈 American Football / NFL
+  nfl: [
+    "https://www.espn.com/espn/rss/nfl/news",                    // ESPN NFL
+    "https://www.cbssports.com/rss/headlines/nfl/",              // CBS Sports NFL
+    "https://bleacherreport.com/nfl.rss",                        // Bleacher Report NFL
+    "https://feeds.bbci.co.uk/sport/american-football/rss.xml",  // BBC American Football
+  ],
+  // 🏀 Basketball / NBA
+  basketball: [
+    "https://www.espn.com/espn/rss/nba/news",                    // ESPN NBA
+    "https://www.cbssports.com/rss/headlines/nba/",              // CBS Sports NBA
+    "https://bleacherreport.com/nba.rss",                        // Bleacher Report NBA
+    "https://feeds.bbci.co.uk/sport/basketball/rss.xml",         // BBC Basketball
+  ],
+  // 🧗 Climbing
+  climbing: [
+    "https://www.climbing.com/feed/",                            // Climbing Magazine
+    "https://www.ukclimbing.com/rss/news.xml",                   // UKClimbing
+    "https://www.planetmountain.com/en/rss/news.xml",            // Planet Mountain
+    "https://gripped.com/feed/",                                 // Gripped
+    "https://www.thecrag.com/rss/news",                          // TheCrag community
+    "https://www.alpinist.com/feed",                             // Alpinist Magazine
+    "https://www.8a.nu/rss/news",                                // 8a.nu — grades & ascents
+    "https://eveningsends.com/feed/",                            // Evening Sends
+  ],
   cars:     ["https://www.motor1.com/rss/news/all/","https://www.autocar.co.uk/rss","https://electrek.co/feed/","https://www.topgear.com/car-news/rss","https://www.racefans.net/feed/","https://www.autosport.com/rss/f1/news/"],
   motos:    ["https://www.motorcycledaily.com/feed","https://www.rideapart.com/rss/articles/all","https://www.webbikeworld.com/feed","https://www.racefans.net/feed/","https://www.autosport.com/rss/motogp/news/","https://www.motorsport.com/rss/motogp/news/"],
 
@@ -104,6 +140,95 @@ const CATEGORY_FILTERS = {
               "championship","league","goal","score","win","defeat","injury","club","squad",
               "stadium","manager","coach","fixture","fixture","standings","table","cup",
               "ufc","mma","boxing","swimming","cycling","marathon","race","athlete"],
+  },
+  football: {
+    require: [
+      // Generic football
+      "football","soccer","goal","goals","match","matches","fixture","fixtures",
+      "transfer","signing","squad","manager","coach","stadium","derby","rivalry",
+      "nil","penalty","red card","yellow card","offside","var","referee",
+      // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League
+      "premier league","epl","arsenal","chelsea","liverpool","manchester","man utd",
+      "man city","tottenham","spurs","newcastle","aston villa","west ham","everton",
+      "brighton","fulham","brentford","crystal palace","wolves","nottingham",
+      // 🇪🇸 La Liga
+      "la liga","real madrid","barcelona","atletico madrid","athletic bilbao",
+      "sevilla","villarreal","real sociedad","betis","valencia","osasuna",
+      // 🇮🇹 Serie A
+      "serie a","juventus","inter milan","ac milan","napoli","roma","lazio",
+      "fiorentina","atalanta","bologna","torino","udinese",
+      // 🇫🇷 Ligue 1
+      "ligue 1","psg","paris saint-germain","marseille","lyon","monaco","nice",
+      "lens","lille","rennes","monaco",
+      // 🇩🇪 Bundesliga
+      "bundesliga","bayern munich","borussia dortmund","bvb","rb leipzig",
+      "bayer leverkusen","eintracht frankfurt","wolfsburg","freiburg","gladbach",
+      // 🇵🇹 Primeira Liga
+      "primeira liga","benfica","porto","sporting cp","sporting lisbon","braga",
+      "vitoria guimaraes","boavista","gil vicente",
+      // 🌍 European competitions
+      "champions league","uefa","europa league","conference league","ucl","uel",
+      "world cup","euro 2024","euro 2025","nations league","copa del rey",
+      // Players & managers
+      "mbappe","vinicius","bellingham","salah","haaland","kane","ronaldo","messi",
+      "guardiola","klopp","mourinho","ancelotti","arteta","ten hag","slot",
+    ],
+  },
+  nfl: {
+    require: [
+      "nfl","american football","quarterback","touchdown","superbowl","super bowl",
+      "nfc east","nfc west","nfc north","nfc south","afc east","afc west","afc north","afc south",
+      "new england patriots","dallas cowboys","kansas city chiefs","san francisco 49ers",
+      "philadelphia eagles","new york giants","new york jets","baltimore ravens",
+      "cincinnati bengals","cleveland browns","pittsburgh steelers","houston texans",
+      "indianapolis colts","jacksonville jaguars","tennessee titans","denver broncos",
+      "las vegas raiders","los angeles chargers","seattle seahawks","los angeles rams",
+      "arizona cardinals","atlanta falcons","carolina panthers","new orleans saints",
+      "tampa bay buccaneers","green bay packers","chicago bears","detroit lions",
+      "minnesota vikings","patrick mahomes","jalen hurts","brock purdy","josh allen",
+      "lamar jackson","dak prescott","c.j. stroud","nfl draft","nfl trade",
+      "wide receiver","tight end","running back","offensive line","defensive end",
+    ],
+  },
+  basketball: {
+    require: [
+      "nba","basketball","euroleague","fiba",
+      "los angeles lakers","golden state warriors","boston celtics","chicago bulls",
+      "miami heat","brooklyn nets","milwaukee bucks","denver nuggets","phoenix suns",
+      "los angeles clippers","new york knicks","philadelphia 76ers","atlanta hawks",
+      "cleveland cavaliers","indiana pacers","toronto raptors","san antonio spurs",
+      "houston rockets","memphis grizzlies","new orleans pelicans","oklahoma city thunder",
+      "minnesota timberwolves","sacramento kings","portland trail blazers","utah jazz",
+      "detroit pistons","orlando magic","charlotte hornets","washington wizards",
+      "lebron james","stephen curry","kevin durant","giannis antetokounmpo","joel embiid",
+      "nikola jokic","luka doncic","jayson tatum","devin booker","anthony edwards",
+      "victor wembanyama","nba finals","nba playoffs","nba all-star","nba trade",
+      "slam dunk","three-pointer","triple-double","nba draft",
+    ],
+  },
+  climbing: {
+    require: [
+      // Core terms — specific enough to not bleed
+      "climbing","rock climbing","climber","free climbing","bouldering","boulderer",
+      "lead climbing","sport climbing","trad climbing","traditional climbing",
+      "free solo","free soloing","big wall climbing","alpine climbing","alpinist",
+      "speed climbing","competition climbing","climbing competition","climbing world cup",
+      // Grades and technical terms
+      "v-grade","v10","v11","v12","v13","v14","v15","v16",
+      "font grade","8a","8b","8c","9a","9b","9c","7c+","8a+","8b+","8c+",
+      "first ascent","ifsc","climbing olympics",
+      "climbing route","climbing crag","climbing gym","climbing wall","dyno",
+      // Athletes
+      "magnus midtbø","adam ondra","chris sharma","alex megos","janja garnbret",
+      "alex honnold","tommy caldwell","shauna coxsey","bronja","mia krampl",
+      "sean mccoll","tomoa narasaki","alberto ginés","jessica pilz","stefano ghisolfi",
+      // Iconic locations
+      "yosemite climbing","el capitan","dawn wall","the nose","red rock canyon",
+      "fontainebleau","rocklands","magic wood","bishop bouldering","hueco tanks",
+      // Media sources
+      "ukclimbing","climbing magazine","gripped magazine","planet mountain","8a.nu",
+      "desnivel","vertical life","climbing daily","kairn.com",
+    ],
   },
   crypto: {
     require: [
@@ -230,6 +355,22 @@ const YOUTUBE_SOURCES = {
   business: [YT("UCrGyqELkKkXKggRphOTv0Tg"),YT("UCvJJ_dzjViJCoLf5uKUTwoA")],
   science:  [YT("UCZYTClx2T1of7BRZ86-8fow"),YT("UC7DdEm33SyaTDtWYGO2CwdA")],
   sports:   [YT("UCqZQlzSHbVJrwrn5XvzrzcA"),YT("UC1QLLgrGrpTqpad0zJB4Tsg")],
+  football: [
+    YT("UCqZQlzSHbVJrwrn5XvzrzcA"), // Premier League official
+    YT("UCnSj7U62wodgrNaKan6ee0A"), // UEFA Champions League
+    YT("UC1QLLgrGrpTqpad0zJB4Tsg"), // Sky Sports Football
+    YT("UCPIycc6GXKVBECHOSFBSg"),   // La Liga highlights
+  ],
+  nfl:       [YT("UCB55n7INy5R-Gm7hKCGg17Q"), YT("UCnUYZLuoy1rq1aVMwx4aTzw"), YT("UCCTNKmMkoBtA14_Ut5oqYSQ")], // NFL, ESPN, CBS Sports
+  basketball:[YT("UChTEMZBCsTmYO3lM_EHSAEQ"), YT("UCnUYZLuoy1rq1aVMwx4aTzw"), YT("UCEjOSbbaOfgnfRODEEMbb2g")], // NBA, ESPN, House of Highlights
+  climbing:  [
+    YT("UCX9ok0rHnvnENLSK7jdnXxA"), // Magnus Midtbø — pro climber vlogs
+    YT("UCNs4zEpFBVCSIMWTGdDV8SA"), // Bouldering Bobat — bouldering sessions
+    YT("UC6-AxoFaAaH8ZBZzBjFVRNQ"), // Eddie Fowke — climbing content
+    YT("UCxBwtFb3bMOZC_VRlQonMCg"), // Adam Ondra official
+    YT("UCJGBv_rEJdSfECLKPp5CIcg"), // IFSC — official competition streams
+    YT("UCDkHoar3b66fMoNLFMiIgGw"), // Climbing Daily — news & reviews
+  ],
   cars:     [YT("UCjOl2AUblVmg2rA_cRgZkFg"),YT("UCUhFaUpnq31m6TNX2VKVSVA"),YT("UCP3zorCFfVFSGIPUFJziFqA"),YT("UCtze5KM-rMmzBP0HlMN0iKw")],
   motos:    [YT("UCB_cdRhIDhlavY2I5URSC7g"),YT("UCMkMkYwBjSxAaxEBdQBxl5Q"),YT("UCpfBFKpvBpbv7OEzCi8YVWQ"),YT("UC_CjHSEYBFGcuL9Sj-AhVIg")],
   stocks:   [YT("UCvJJ_dzjViJCoLf5uKUTwoA"),YT("UCrGyqELkKkXKggRphOTv0Tg")],
@@ -299,6 +440,15 @@ const BUSINESS_SECTIONS = [
   { id:"crypto",   label:"₿ Crypto",   short:"Crypto" },
 ];
 
+// ─── SPORTS SUB-SECTIONS ─────────────────────────────────────────────────────
+const SPORTS_SECTIONS = [
+  { id:"sports",     label:"🏆 All Sports",  short:"All" },
+  { id:"football",   label:"⚽ Football",    short:"Football" },
+  { id:"nfl",        label:"🏈 NFL",         short:"NFL" },
+  { id:"basketball", label:"🏀 Basketball",  short:"NBA" },
+  { id:"climbing",   label:"🧗 Climbing",    short:"Climb" },
+];
+
 // ─── VIBE SECTIONS ────────────────────────────────────────────────────────────
 const VIBE_SECTIONS = [
   { id:"goodnews", label:"😊 Good News", short:"Good" },
@@ -315,17 +465,17 @@ const WORLD_REGIONS = [
 ];
 
 const CATEGORIES = [
-  { id:"top",      label:"Top",         short:"Top",   icon:"◈" },
-  { id:"world",    label:"World",       short:"World", icon:"◎", hasDropdown:true },
-  { id:"tech",     label:"Tech",        short:"Tech",  icon:"⟡" },
-  { id:"business", label:"Business",    short:"Biz",   icon:"◇" },
-  { id:"science",  label:"Science",     short:"Sci",   icon:"⬡" },
-  { id:"sports",   label:"Sports",      short:"Sport", icon:"◉" },
-  { id:"cars",     label:"Cars",        short:"Cars",  icon:"▷" },
-  { id:"motos",    label:"Motorcycles", short:"Motos", icon:"◍" },
+  { id:"top",      label:"Top",         short:"Top",   icon:"⚡" },
+  { id:"world",    label:"World",       short:"World", icon:"🌍", hasDropdown:true },
+  { id:"tech",     label:"Tech",        short:"Tech",  icon:"💻" },
+  { id:"business", label:"Business",    short:"Biz",   icon:"📊" },
+  { id:"science",  label:"Science",     short:"Sci",   icon:"🔬" },
+  { id:"sports",   label:"Sports",      short:"Sport", icon:"🏆" },
+  { id:"cars",     label:"Cars",        short:"Cars",  icon:"🚗" },
+  { id:"motos",    label:"Motorcycles", short:"Motos", icon:"🏍" },
   { id:"vibe",     label:"Vibe",        short:"Vibe",  icon:"😊" },
   { id:"live",     label:"Media",       short:"Media", icon:"📡" },
-  { id:"saved",    label:"Saved",       short:"Saved", icon:"◆" },
+  { id:"saved",    label:"Saved",       short:"Saved", icon:"🔖" },
 ];
 
 const RSS_PROXY = "/.netlify/functions/rss?url="; // our own proxy — no rate limits
@@ -466,8 +616,8 @@ async function fetchFeed(url, delayMs = 0) {
     const feedTitle = data.feed?.title || new URL(url).hostname.replace("www.", "");
     return (data.feed?.items || []).map(item => ({
       id:          item.guid || item.link || item.title,
-      title:       item.title || "",
-      description: item.description || "",
+      title:       stripHtml(item.title || ""),
+      description: stripHtml(item.description || ""),
       url:         item.link || "",
       image:       item.image || extractImage(item.description) || null,
       source:      feedTitle,
@@ -494,7 +644,29 @@ async function fetchYouTubeFeed(channelId) {
     }));
   } catch { return []; }
 }
-const stripHtml = h => h.replace(/<[^>]*>/g,"").replace(/&[^;]+;/g," ").trim().slice(0,400);
+const stripHtml = h => {
+  if (!h) return "";
+  return h
+    .replace(/<[^>]*>/g, " ")       // strip HTML tags
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#8211;/g, "—")
+    .replace(/&#8212;/g, "—")
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&#8230;/g, "…")
+    .replace(/&#\d+;/g, " ")        // any remaining numeric entities
+    .replace(/&[a-z]+;/g, " ")      // any remaining named entities
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 400);
+};
 function extractImage(html) {
   if (!html) return null;
   const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
@@ -562,9 +734,30 @@ function clearExpiredCache() {
 
 function shareArticle(article, platform = "default") {
   const shareText = `${article.title} — via The Brief`;
-  const shareUrl  = "https://thebriefnews.org";
+  const articleUrl = article.url || "";
+
+  // Generate a short key and store metadata in sessionStorage
+  // This keeps the shared URL clean: thebriefnews.org/?a=abc123
+  // instead of a massive encoded URL
+  let shareUrl = "https://thebriefnews.org";
+  if (articleUrl) {
+    // Encode full URL as base64 so any device can recover it
+    const key = btoa(unescape(encodeURIComponent(articleUrl))).replace(/[+/=]/g, c => ({"+":"_","/":"-","=":""})[c]);
+    try {
+      sessionStorage.setItem("tb_" + key.slice(0, 12), JSON.stringify({
+        title:       article.title || "",
+        description: article.description || "",
+        source:      article.source || "",
+        image:       article.image || "",
+        url:         articleUrl,
+      }));
+    } catch {}
+    shareUrl = `https://thebriefnews.org/?a=${key}`;
+  }
+
+  const fullText = `${shareText}\n${shareUrl}`;
   if (platform === "whatsapp") {
-    window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, "_blank");
     return;
   }
   if (platform === "twitter") {
@@ -572,9 +765,9 @@ function shareArticle(article, platform = "default") {
     return;
   }
   if (navigator.share) {
-    navigator.share({ title: shareText, text: shareText, url: shareUrl }).catch(() => {});
+    navigator.share({ title: article.title, text: shareText, url: shareUrl }).catch(() => {});
   } else {
-    navigator.clipboard?.writeText(`${shareText}\n${shareUrl}`).catch(() => {});
+    navigator.clipboard?.writeText(fullText).catch(() => {});
   }
 }
 
@@ -918,8 +1111,8 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:"auto" }}>
         <div style={{ color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s" }}>READ STORY →</div>
         <div style={{ display:"flex", gap:"0.4rem", position:"relative" }}>
-          <button ref={shareBtnRef} onClick={handleShareClick} title="Share" style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", transition:"all 0.2s" }}>⇪</button>
-          <button onClick={handleBookmark} title={isBookmarked?"Remove":"Save"} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.65rem", transition:"all 0.2s" }}>{isBookmarked?"◆":"◇"}</button>
+          <button ref={shareBtnRef} onClick={handleShareClick} title="Share this story" style={{ background:"transparent", border:`1px solid ${th.accentBord}`, color:th.accent, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", transition:"all 0.2s", display:"flex", alignItems:"center", gap:"0.3rem" }} onMouseEnter={e=>e.currentTarget.style.background=th.accentBg} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span>↗</span><span>SHARE</span></button>
+          <button onClick={handleBookmark} title={isBookmarked?"Remove bookmark":"Save for later"} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${th.accentBord}`, color:th.accent, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", transition:"all 0.2s", display:"flex", alignItems:"center", gap:"0.3rem" }} onMouseEnter={e=>e.currentTarget.style.background=th.accentBg} onMouseLeave={e=>{ if(!isBookmarked) e.currentTarget.style.background="transparent"; }}><span>🔖</span><span>{isBookmarked?"SAVED":"SAVE FOR LATER"}</span></button>
           {showShare && <ShareMenu article={article} th={th} onClose={()=>setShowShare(false)} btnRef={shareBtnRef} />}
         </div>
       </div>
@@ -933,12 +1126,12 @@ function TrendingBar({ topics, activeFilter, onFilter, th }) {
   return (
     <div style={{ borderBottom:`1px solid ${th.borderSub}`, padding:"0.5rem 0", overflowX:"auto", scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:"0.4rem", alignItems:"center", flexWrap:"wrap", justifyContent:"center" }} className="trending-inner">
-        <span style={{ color:th.textFaint, fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em", flexShrink:0 }}>TRENDING</span>
+        <span style={{ color:th.textMuted, fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em", flexShrink:0 }}>TRENDING</span>
         {activeFilter && (
           <button onClick={() => onFilter(null)} style={{ background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", color:"#f87171", borderRadius:20, padding:"3px 10px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", flexShrink:0, display:"flex", alignItems:"center", gap:"0.3rem" }}>✕ {activeFilter}</button>
         )}
         {topics.map(topic => (
-          <button key={topic} onClick={() => onFilter(activeFilter === topic ? null : topic)} style={{ background: activeFilter===topic ? th.accentBg : th.bgInput, border:`1px solid ${activeFilter===topic ? th.accentBord : th.border}`, color: activeFilter===topic ? th.accent : th.textMuted, borderRadius:20, padding:"3px 12px", cursor:"pointer", fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0 }}>
+          <button key={topic} onClick={() => onFilter(activeFilter === topic ? null : topic)} style={{ background: activeFilter===topic ? th.accentBg : th.bgInput, border:`1px solid ${activeFilter===topic ? th.accentBord : th.border}`, color: activeFilter===topic ? th.accent : th.text, borderRadius:20, padding:"3px 12px", cursor:"pointer", fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0 }}>
             {topic}
           </button>
         ))}
@@ -1099,8 +1292,8 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark, allArticles,
             ))}
           </div>
           <div style={{ display:"flex", gap:"0.5rem", alignItems:"center", flexWrap:"wrap", position:"relative" }}>
-            <button onClick={()=>onBookmark(article)} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer" }}>{isBookmarked?"◆ SAVED":"◇ SAVE"}</button>
-            <button ref={shareBtnRef} onClick={()=>setShowShare(s=>!s)} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer" }}>⇪ SHARE</button>
+            <button onClick={()=>onBookmark(article)} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s" }}>{isBookmarked?"🔖 SAVED":"🔖 SAVE FOR LATER"}</button>
+            <button ref={shareBtnRef} onClick={()=>setShowShare(s=>!s)} style={{ background:showShare?th.accentBg:"transparent", border:`1px solid ${showShare?th.accentBord:th.border}`, color:showShare?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s" }}>⇪ SHARE STORY</button>
             {showShare && <ShareMenu article={article} th={th} onClose={()=>setShowShare(false)} btnRef={shareBtnRef} />}
             <button onClick={()=>setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap" }}>⬡ READ IN-APP</button>
             <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ color:th.textSource, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", textDecoration:"none", border:`1px solid ${th.border}`, padding:"4px 10px", borderRadius:3, whiteSpace:"nowrap" }}>SOURCE ↗</a>
@@ -1643,7 +1836,23 @@ function BusinessSectionBar({ activeSection, onSelect, th }) {
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }}>
         {BUSINESS_SECTIONS.map(s => (
           <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
-            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.textMuted, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.text, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// SportsSectionBar
+function SportsSectionBar({ activeSection, onSelect, th }) {
+  return (
+    <div style={{ borderTop:`1px solid ${th.borderTab}`, background:th.bgHeader, overflowX:"auto", scrollbarWidth:"none" }}>
+      <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }}>
+        {SPORTS_SECTIONS.map(s => (
+          <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
+            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.text, opacity:activeSection===s.id?1:0.65, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
             {s.label}
           </button>
         ))}
@@ -1664,7 +1873,7 @@ function VibeSectionBar({ activeSection, onSelect, th }) {
           const active = activeSection === s.id;
           return (
             <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
-              style={{ background:active?`${c}18`:"transparent", border:`1px solid ${active?c:th.border}`, color:active?c:th.textMuted, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+              style={{ background:active?`${c}18`:"transparent", border:`1px solid ${active?c:th.border}`, color:active?c:th.text, opacity:active?1:0.65, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
               {s.label}
             </button>
           );
@@ -1686,7 +1895,7 @@ function WorldRegionBar({ activeRegion, onSelect, th }) {
             style={{
               background:    activeRegion===r.id ? th.accentBg : "transparent",
               border:        `1px solid ${activeRegion===r.id ? th.accentBord : th.border}`,
-              color:         activeRegion===r.id ? th.accent : th.textMuted,
+              color:         activeRegion===r.id ? th.accent : th.text,
               borderRadius:  20,
               padding:       "0.3rem 0.85rem",
               cursor:        "pointer",
@@ -1714,6 +1923,7 @@ export default function NewsApp() {
   const [activeRegion,       setActiveRegion]       = useState("world");
   const [activeMediaSection, setActiveMediaSection] = useState("video");
   const [activeBusinessSection, setActiveBusinessSection] = useState("business");
+  const [activeSportsSection,   setActiveSportsSection]   = useState("sports");
   const [activeVibeSection,     setActiveVibeSection]     = useState("goodnews");
   const [articles,        setArticles]        = useState([]);
   const [videos,          setVideos]          = useState([]);
@@ -1723,6 +1933,7 @@ export default function NewsApp() {
   const [selectedVideo,   setSelectedVideo]   = useState(null);
   const [lastUpdated,     setLastUpdated]     = useState(null);
   const [search,          setSearch]          = useState("");
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showContact,     setShowContact]     = useState(false);
   const [bookmarks,       setBookmarks]       = useState(loadBookmarks);
   const [showScrollTop,   setShowScrollTop]   = useState(false);
@@ -1736,6 +1947,46 @@ export default function NewsApp() {
 
   // Clear expired localStorage cache on mount
   useEffect(() => { clearExpiredCache(); }, []);
+
+  // Deep link handler — ?a=KEY opens article using stored metadata
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const key = params.get("a");
+      if (!key) return;
+
+      // Try sessionStorage first (same device/session)
+      let meta = null;
+      try { meta = JSON.parse(sessionStorage.getItem("tb_" + key.slice(0, 12))); } catch {}
+
+      // Decode the full article URL from the base64 key (works on any device)
+      let decodedUrl = "";
+      try {
+        const b64 = key.replace(/_/g, "+").replace(/-/g, "/");
+        const padded = b64 + "==".slice(0, (4 - b64.length % 4) % 4);
+        decodedUrl = decodeURIComponent(escape(atob(padded)));
+        // Validate it looks like a URL
+        if (!decodedUrl.startsWith("http")) decodedUrl = "";
+      } catch { decodedUrl = ""; }
+
+      const articleUrl = meta?.url || decodedUrl;
+
+      if (articleUrl) {
+        setSelectedArticle({
+          id:          articleUrl,
+          title:       meta?.title || "Opening article...",
+          description: meta?.description || "",
+          url:         articleUrl,
+          image:       meta?.image || null,
+          source:      meta?.source || new URL(articleUrl).hostname.replace("www.", ""),
+          publishedAt: new Date(),
+          type:        "article",
+        });
+      }
+      // Clean URL so refresh doesn't reopen
+      window.history.replaceState({}, "", window.location.pathname);
+    } catch {}
+  }, []);
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -1763,6 +2014,7 @@ export default function NewsApp() {
   const VIBE_CATS     = ["goodnews","funny","weird"];
   const feedKey = activeCategory === "world"    ? activeRegion
                 : activeCategory === "business" ? activeBusinessSection
+                : activeCategory === "sports"   ? activeSportsSection
                 : activeCategory === "vibe"     ? activeVibeSection
                 : activeCategory;
   
@@ -1811,12 +2063,20 @@ export default function NewsApp() {
         const allArt = artRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
         const allVid = vidRes.flatMap(r=>r.status==="fulfilled"?r.value:[]);
         const SOFT_FILTER_CATEGORIES = new Set(["cars","stocks","crypto","science","sports","motos","tech","business","goodnews","funny","weird"]);
+        // football/nfl/basketball/climbing use strict filtering — no fallback
         let filteredArt = allArt.filter(a => passesFilter(a, key));
         if (SOFT_FILTER_CATEGORIES.has(key) && filteredArt.length < 3) {
           filteredArt = allArt;
         }
         const sortedArt = dedupe(filteredArt).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
-        const sortedVid = dedupe(allVid).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt)).slice(0,4);
+        // Apply same keyword filter to videos — stops off-topic videos bleeding in
+        // Strict categories (nfl/basketball/climbing/football) always filter
+        // Soft categories fall back to unfiltered if fewer than 2 video matches
+        let filteredVid = allVid.filter(v => passesFilter(v, key));
+        if (SOFT_FILTER_CATEGORIES.has(key) && filteredVid.length < 2) {
+          filteredVid = allVid;
+        }
+        const sortedVid = dedupe(filteredVid).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt)).slice(0,4);
         if (!sortedArt.length && !sortedVid.length) throw new Error("No content found. Check your connection.");
         const payload = { articles:sortedArt, videos:sortedVid };
         cacheRef.current[key] = payload;
@@ -1839,7 +2099,7 @@ export default function NewsApp() {
   useEffect(() => { loadNews(feedKey); }, [feedKey, loadNews]);
 
   // Reset trending filter when category changes
-  useEffect(() => { setTrendingFilter(null); }, [activeCategory, activeRegion, activeBusinessSection, activeVibeSection]);
+  useEffect(() => { setTrendingFilter(null); }, [activeCategory, activeRegion, activeBusinessSection, activeSportsSection, activeVibeSection]);
 
   const handleCategoryClick = (id) => {
     setActiveCategory(id);
@@ -1848,6 +2108,7 @@ export default function NewsApp() {
     if (id !== "world")    setActiveRegion("world");
     if (id !== "live")     setActiveMediaSection("video");
     if (id !== "business") setActiveBusinessSection("business");
+    if (id !== "sports")   setActiveSportsSection("sports");
     if (id !== "vibe")     setActiveVibeSection("goodnews");
   };
   const handleRegionSelect = (regionId) => {
@@ -1861,6 +2122,11 @@ export default function NewsApp() {
   };
   const handleBusinessSectionSelect = (sectionId) => {
     setActiveBusinessSection(sectionId);
+    setSearch("");
+    scrollToTop();
+  };
+  const handleSportsSectionSelect = (sectionId) => {
+    setActiveSportsSection(sectionId);
     setSearch("");
     scrollToTop();
   };
@@ -1922,10 +2188,12 @@ const buildMixed = () => {
   const isSaved    = activeCategory === "saved";
   const isWorld    = activeCategory === "world";
   const isBusiness = activeCategory === "business";
+  const isSports   = activeCategory === "sports";
   const isVibe     = activeCategory === "vibe";
   const currentRegion          = WORLD_REGIONS.find(r=>r.id===activeRegion) || WORLD_REGIONS[0];
   const currentMediaSection    = MEDIA_SECTIONS.find(s=>s.id===activeMediaSection) || MEDIA_SECTIONS[0];
   const currentBusinessSection = BUSINESS_SECTIONS.find(s=>s.id===activeBusinessSection) || BUSINESS_SECTIONS[0];
+  const currentSportsSection   = SPORTS_SECTIONS.find(s=>s.id===activeSportsSection) || SPORTS_SECTIONS[0];
   const currentVibeSection     = VIBE_SECTIONS.find(s=>s.id===activeVibeSection) || VIBE_SECTIONS[0];
 
   return (
@@ -1967,6 +2235,11 @@ const buildMixed = () => {
           .region-inner{flex-wrap:nowrap !important;justify-content:flex-start !important;width:max-content}
         }
         @media(max-width:480px){.cat-tab{padding:0.55rem 0.45rem !important}}
+        @media(max-width:640px){
+          .search-desktop{display:none !important}
+          .search-mobile{display:flex !important}
+        }
+        @keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
         @media(max-width:420px){
           .cat-full{display:none !important}
           .cat-short{display:inline !important;font-size:0.44rem !important;letter-spacing:0.04em !important}
@@ -1985,11 +2258,13 @@ const buildMixed = () => {
             <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.accent, letterSpacing:"-0.03em" }}>Brief</span>
             <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.44rem", color:th.textMuted, letterSpacing:"0.2em", marginLeft:"0.35rem", textTransform:"uppercase" }}>Live</span>
           </div>
-          {/* Search */}
-          <div style={{ flex:1, maxWidth:260, position:"relative", display:"flex", alignItems:"center" }}>
+          {/* Search — desktop: inline input | mobile: icon → floating overlay */}
+          <div style={{ flex:1, maxWidth:260, position:"relative", display:"flex", alignItems:"center" }} className="search-desktop">
             <span style={{ position:"absolute", left:10, color:th.textMuted, fontSize:"0.85rem", pointerEvents:"none" }}>⌕</span>
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." style={{ width:"100%", background:th.bgInput, border:`1px solid ${th.border}`, borderRadius:5, padding:"0.4rem 0.7rem 0.4rem 1.9rem", color:th.text, fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", transition:"border-color 0.2s" }} />
           </div>
+          {/* Mobile search icon */}
+          <button onClick={()=>setShowMobileSearch(true)} className="search-mobile" style={{ background:"transparent", border:`1px solid ${th.border}`, borderRadius:5, width:34, height:34, display:"none", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:"1rem", color:th.textMuted, flexShrink:0 }} title="Search">🔍</button>
           {/* Right controls */}
           <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexShrink:0 }}>
             <WeatherWidget weather={weather} th={th} />
@@ -2009,14 +2284,19 @@ const buildMixed = () => {
         {/* Category tabs */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:0, overflowX:"auto", borderTop:`1px solid ${th.borderTab}`, scrollbarWidth:"none" }}>
           {CATEGORIES.map(cat => (
-            <button key={cat.id} onClick={()=>handleCategoryClick(cat.id)} className="cat-tab" style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?catAccent:"transparent"}`, color:activeCategory===cat.id?catAccent:th.textMuted, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0 }}>
-              <span style={{ fontSize:cat.id==="live"?"0.85rem":"0.72rem" }}>{cat.icon}</span>
+            <button key={cat.id} onClick={()=>handleCategoryClick(cat.id)} className="cat-tab" style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?catAccent:"transparent"}`, color:activeCategory===cat.id?catAccent:th.text, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0, opacity:activeCategory===cat.id?1:0.65 }}>
+              <span style={{ fontSize:"0.85rem" }}>{cat.icon}</span>
               <span className="cat-label cat-full">{cat.label}</span>
               <span className="cat-label cat-short" style={{ display:"none" }}>{cat.short}</span>
               {/* Sub-section indicators */}
               {cat.id==="world" && activeCategory==="world" && activeRegion !== "world" && (
                 <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
                   {WORLD_REGIONS.find(r=>r.id===activeRegion)?.short}
+                </span>
+              )}
+              {cat.id==="sports" && activeCategory==="sports" && activeSportsSection !== "sports" && (
+                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
+                  {SPORTS_SECTIONS.find(s=>s.id===activeSportsSection)?.short}
                 </span>
               )}
               {cat.id==="business" && activeCategory==="business" && activeBusinessSection !== "business" && (
@@ -2035,7 +2315,7 @@ const buildMixed = () => {
             </button>
           ))}
           {!isSaved && !isLive && (
-            <button onClick={()=>{ delete cacheRef.current[feedKey]; localStorage.removeItem("theBriefCache_"+feedKey); loadNews(feedKey); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textFaint, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
+            <button onClick={()=>{ delete cacheRef.current[feedKey]; localStorage.removeItem("theBriefCache_"+feedKey); loadNews(feedKey); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textMuted, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
               ↺ <span className="cat-label cat-full" style={{ fontSize:"0.55rem", letterSpacing:"0.12em" }}>REFRESH</span>
             </button>
           )}
@@ -2045,6 +2325,7 @@ const buildMixed = () => {
         {isWorld    && <WorldRegionBar activeRegion={activeRegion} onSelect={handleRegionSelect} th={th} />}
         {isMedia    && <MediaSectionBar activeSection={activeMediaSection} onSelect={handleMediaSectionSelect} th={th} />}
         {isBusiness && <BusinessSectionBar activeSection={activeBusinessSection} onSelect={handleBusinessSectionSelect} th={th} />}
+        {isSports   && <SportsSectionBar activeSection={activeSportsSection} onSelect={handleSportsSectionSelect} th={th} />}
         {isVibe     && <VibeSectionBar activeSection={activeVibeSection} onSelect={handleVibeSectionSelect} th={th} />}
       </header>
 
@@ -2066,6 +2347,7 @@ const buildMixed = () => {
             <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", fontWeight:700, color:th.textHead, letterSpacing:"-0.01em" }}>
               {isWorld    && activeRegion !== "world" ? currentRegion.label
               : isBusiness && activeBusinessSection !== "business" ? currentBusinessSection.label
+              : isSports   && activeSportsSection !== "sports" ? currentSportsSection.label
               : isVibe     ? currentVibeSection.label
               : isMedia    ? currentMediaSection.label
               : CATEGORIES.find(c=>c.id===activeCategory)?.label}
@@ -2076,11 +2358,15 @@ const buildMixed = () => {
             {isVibe && activeVibeSection === "goodnews" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😊 GOOD VIBES</span>}
             {isVibe && activeVibeSection === "funny"    && <span style={{ background:"rgba(245,158,11,0.1)", color:"#f59e0b", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😂 FUNNY</span>}
             {isVibe && activeVibeSection === "weird"    && <span style={{ background:"rgba(168,85,247,0.1)", color:"#a855f7", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🌀 WEIRD</span>}
+            {isSports && activeSportsSection === "football"   && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>⚽ FOOTBALL</span>}
+            {isSports && activeSportsSection === "nfl"        && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🏈 NFL</span>}
+            {isSports && activeSportsSection === "basketball" && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🏀 BASKETBALL</span>}
+            {isSports && activeSportsSection === "climbing"   && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🧗 CLIMBING</span>}
             {isBusiness && activeBusinessSection === "stocks" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>📈 MARKETS</span>}
             {isBusiness && activeBusinessSection === "crypto" && <span style={{ background:"rgba(249,115,22,0.1)", color:"#f97316", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>₿ CRYPTO</span>}
             {trendingFilter && <span style={{ background:th.accentBg, color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", padding:"2px 8px", borderRadius:10 }}>◈ {trendingFilter}</span>}
             {!isSaved && !isLive && !loading && (filteredArticles.length+filteredVideos.length)>0 && (
-              <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>
+              <span style={{ color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", opacity:0.8 }}>
                 {filteredArticles.length} stories{filteredVideos.length>0?` · ${filteredVideos.length} videos`:""}
               </span>
             )}
@@ -2196,9 +2482,18 @@ const buildMixed = () => {
       {/* ── FOOTER ── */}
       <footer style={{ borderTop:`1px solid ${th.borderSub}`, padding:"2rem 1rem" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"1rem", textAlign:"center" }}>
-          <a href="https://www.producthunt.com/products/the-brief-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-the-brief-4" target="_blank" rel="noopener noreferrer" style={{ display:"inline-block" }} onMouseEnter={e=>e.currentTarget.style.opacity="0.85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
-            <img alt="The Brief | Product Hunt" width="200" height="43" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1121244&theme=dark&t=1775992143795" style={{ display:"block" }} />
-          </a>
+          {/* Product Hunt + PayPal side by side */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", flexWrap:"wrap" }}>
+            <a href="https://www.producthunt.com/products/the-brief-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-the-brief-4" target="_blank" rel="noopener noreferrer" style={{ display:"inline-block", transition:"opacity 0.2s" }} onMouseEnter={e=>e.currentTarget.style.opacity="0.85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+              <img alt="The Brief | Product Hunt" width="200" height="43" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1121244&theme=dark&t=1775992143795" style={{ display:"block" }} />
+            </a>
+            <a href="https://www.paypal.com/donate/?hosted_button_id=9TG9LTUD9WFE4" target="_blank" rel="noopener noreferrer"
+              style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0 1.1rem", height:43, borderRadius:6, background:"linear-gradient(135deg,#0070ba,#003087)", color:"#fff", textDecoration:"none", fontWeight:700, fontSize:"0.82rem", fontFamily:"Georgia,serif", letterSpacing:"-0.01em", transition:"opacity 0.2s, transform 0.2s", whiteSpace:"nowrap", boxShadow:"0 2px 12px rgba(0,112,186,0.3)" }}
+              onMouseEnter={e=>{ e.currentTarget.style.opacity="0.9"; e.currentTarget.style.transform="translateY(-1px)"; }}
+              onMouseLeave={e=>{ e.currentTarget.style.opacity="1"; e.currentTarget.style.transform="translateY(0)"; }}>
+              ☕ Support this project
+            </a>
+          </div>
           <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600 }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
           <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
           <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap", justifyContent:"center" }}>
@@ -2212,6 +2507,25 @@ const buildMixed = () => {
           </div>
         </div>
       </footer>
+
+      {/* ── MOBILE SEARCH OVERLAY ── */}
+      {showMobileSearch && (
+        <div style={{ position:"fixed", inset:0, zIndex:300, display:"flex", flexDirection:"column" }} onClick={()=>setShowMobileSearch(false)}>
+          <div style={{ background:th.bgHeader, borderBottom:`1px solid ${th.border}`, padding:"0.75rem 1rem", display:"flex", gap:"0.75rem", alignItems:"center", boxShadow:"0 8px 32px rgba(0,0,0,0.4)", animation:"slideDown 0.2s ease" }} onClick={e=>e.stopPropagation()}>
+            <span style={{ color:th.textMuted, fontSize:"1.1rem" }}>🔍</span>
+            <input
+              autoFocus
+              value={search}
+              onChange={e=>setSearch(e.target.value)}
+              placeholder="Search stories..."
+              style={{ flex:1, background:"transparent", border:"none", outline:"none", color:th.text, fontSize:"16px", fontFamily:"'DM Mono',monospace" }}
+            />
+            {search && <button onClick={()=>setSearch("")} style={{ background:"transparent", border:"none", color:th.textMuted, cursor:"pointer", fontSize:"1rem" }}>✕</button>}
+            <button onClick={()=>{ setShowMobileSearch(false); }} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"4px 10px", borderRadius:4, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace" }}>DONE</button>
+          </div>
+          <div style={{ flex:1, background:"rgba(0,0,0,0.5)" }} />
+        </div>
+      )}
 
       {/* ── MINI PLAYER ── */}
       {nowPlaying && <MiniPlayer track={nowPlaying} onClose={()=>setNowPlaying(null)} th={th} />}
