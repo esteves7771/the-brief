@@ -334,10 +334,24 @@ const CATEGORY_FILTERS = {
 };
 
 // Returns true if the article passes the category filter (should be shown)
+// Trusted channel names per category — videos from these sources always pass
+const TRUSTED_SOURCES = {
+  nfl:        ["nfl","nfl films","nfl network","nfl on espn","nfl highlights","nfl throwback"],
+  basketball: ["nba","house of highlights","basketball","nba highlights"],
+  football:   ["premier league","champions league","uefa","sky sports football","la liga","goal"],
+  climbing:   ["magnus","ondra","bouldering","climbing","ifsc","eddie fowke"],
+};
+
 function passesFilter(article, category) {
   const filter = CATEGORY_FILTERS[category];
   if (!filter) return true; // no filter for this category — show everything
-  const text = ((article.title || "") + " " + (article.description || "") + " " + (article.source || "")).toLowerCase();
+
+  // For videos: if the channel name is a trusted source for this category, auto-pass
+  const sourceLower = (article.source || "").toLowerCase();
+  const trusted = TRUSTED_SOURCES[category] || [];
+  if (trusted.some(t => sourceLower.includes(t))) return true;
+
+  const text = ((article.title || "") + " " + (article.description || "") + " " + sourceLower).toLowerCase();
   return filter.require.some(kw => text.includes(kw));
 }
 
@@ -361,8 +375,18 @@ const YOUTUBE_SOURCES = {
     YT("UC1QLLgrGrpTqpad0zJB4Tsg"), // Sky Sports Football
     YT("UCPIycc6GXKVBECHOSFBSg"),   // La Liga highlights
   ],
-  nfl:       [YT("UCB55n7INy5R-Gm7hKCGg17Q"), YT("UCnUYZLuoy1rq1aVMwx4aTzw"), YT("UCCTNKmMkoBtA14_Ut5oqYSQ")], // NFL, ESPN, CBS Sports
-  basketball:[YT("UChTEMZBCsTmYO3lM_EHSAEQ"), YT("UCnUYZLuoy1rq1aVMwx4aTzw"), YT("UCEjOSbbaOfgnfRODEEMbb2g")], // NBA, ESPN, House of Highlights
+  nfl: [
+    YT("UCDVYQ4Zhbm3S2dlz7P1GBDg"), // NFL official — highlights, news, game clips
+    YT("UCY3NEq2LYrmdoGkevo9BH5A"), // NFL Films — documentaries & feature stories
+    YT("UC_1H9v258pXiyLDaW0R5exw"), // NFL Network — analysis & original shows
+    YT("UCiio0ydw439X13KyZgMIcHw"), // NFL on ESPN — dedicated NFL coverage only
+  ],
+  basketball: [
+    YT("UChTEMZBCsTmYO3lM_EHSAEQ"), // NBA official — highlights, interviews, news
+    YT("UCEjOSbbaOfgnfRODEEMbb2g"), // House of Highlights — dunks, buzzer-beaters
+    YT("UCoh_z6QB0KD_PueTTqBsGSA"), // NBA highlights channel — game recaps
+    YT("UC3L9XPe0_3fAFAy4KHEtyJQ"), // Basketball content daily
+  ],
   climbing:  [
     YT("UCX9ok0rHnvnENLSK7jdnXxA"), // Magnus Midtbø — pro climber vlogs
     YT("UCNs4zEpFBVCSIMWTGdDV8SA"), // Bouldering Bobat — bouldering sessions
