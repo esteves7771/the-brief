@@ -1339,12 +1339,53 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark, allArticles,
             <button onClick={()=>setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.65rem 1.25rem", borderRadius:4, cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem" }}>⬡ READ IN-APP</button>
             <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.65rem 1.25rem", borderRadius:4, textDecoration:"none", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem" }}>OPEN IN BROWSER ↗</a>
           </div>
+          <div style={{ marginTop:"1.25rem", paddingTop:"1rem", borderTop:`1px solid ${th.borderSub}` }}>
+            <a href="https://go.nordpass.io/aff_c?offer_id=488&aff_id=145666&url_id=9356" target="_blank" rel="noopener noreferrer sponsored"
+              style={{ display:"inline-flex", alignItems:"center", gap:"0.4rem", textDecoration:"none", opacity:0.65, transition:"opacity 0.2s" }}
+              onMouseEnter={e=>e.currentTarget.style.opacity="1"}
+              onMouseLeave={e=>e.currentTarget.style.opacity="0.65"}>
+              <span style={{ color:"#64748b", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>🔒 Keep your accounts secure while reading news.</span>
+              <span style={{ color:"#4687d6", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ NordPass</span>
+            </a>
+          </div>
           {/* Related stories */}
           <RelatedStories article={article} allArticles={allArticles} onClick={onSelectRelated} th={th} />
         </div>
       </aside>
       {showBrowser && <InAppBrowser url={article.url} onClose={()=>setShowBrowser(false)} th={th} />}
     </>
+  );
+}
+
+
+// ─── NORD PRIVACY STRIP ───────────────────────────────────────────────────────
+function NordStrip({ category, th }) {
+  const NORDVPN_URL  = "https://go.nordvpn.net/aff_c?offer_id=15&aff_id=145666&url_id=902";
+  const NORDPASS_URL = "https://go.nordpass.io/aff_c?offer_id=488&aff_id=145666&url_id=9356";
+  const isPassCat = ["business","stocks","crypto"].includes(category);
+  const href    = isPassCat ? NORDPASS_URL : NORDVPN_URL;
+  const product = isPassCat ? "NordPass" : "NordVPN";
+  const desktopCopy = {
+    top:"🔒 Your ISP sees what you read.", world:"🔒 Global news, private browsing.",
+    tech:"🔒 Stay private online.", business:"🔒 Keep your accounts secure.",
+    science:"🔒 Browse without being tracked.", sports:"🔒 No logs. No tracking.",
+    cars:"🔒 Browse privately, always.", motos:"🔒 No logs. No tracking.",
+    vibe:"🔒 Good vibes, private browsing.", football:"🔒 No logs. No tracking.",
+    nfl:"🔒 Browse privately, no logs.", basketball:"🔒 Browse privately, no logs.",
+    climbing:"🔒 Explore freely. Stay private.", stocks:"🔒 Keep your accounts secure.",
+    crypto:"🔒 Keep your wallets safe.",
+  };
+  const copy = desktopCopy[category] || "🔒 Stay private online.";
+  return (
+    <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.4rem 1rem", display:"flex", alignItems:"center" }}>
+      <a href={href} target="_blank" rel="noopener noreferrer sponsored"
+        style={{ display:"flex", alignItems:"center", gap:"0.4rem", textDecoration:"none", transition:"opacity 0.2s" }}
+        onMouseEnter={e=>e.currentTarget.style.opacity="0.7"}
+        onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+        <span style={{ color:"#64748b", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>{copy}</span>
+        <span style={{ color:"#4687d6", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ {product}</span>
+      </a>
+    </div>
   );
 }
 
@@ -2262,6 +2303,11 @@ const buildMixed = () => {
         @media(max-width:640px){
           .search-desktop{display:none !important}
           .search-mobile{display:flex !important}
+          .nord-desktop{display:none !important}
+          .nord-mobile{display:inline !important}
+        }
+        @media(min-width:641px){
+          .nord-mobile{display:none !important}
         }
         @keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
         @media(max-width:420px){
@@ -2398,6 +2444,9 @@ const buildMixed = () => {
           {(search || trendingFilter) && <button onClick={()=>{setSearch("");setTrendingFilter(null);}} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"3px 9px", borderRadius:3, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace" }}>CLEAR ✕</button>}
         </div>
 
+        {/* Nord Privacy Strip */}
+        {!isSaved && !isLive && !loading && <NordStrip category={feedKey} th={th} />}
+
         {isSaved && <SavedView bookmarks={bookmarks} onClick={setSelectedArticle} onBookmark={toggleBookmark} th={th} />}
         {isMedia && activeMediaSection === "video"    && <LiveView videos={filteredVideos} loading={loading} onPlay={setSelectedVideo} th={th} />}
         {isMedia && activeMediaSection === "radio"    && <RadioView th={th} onPlay={setNowPlaying} />}
@@ -2511,6 +2560,9 @@ const buildMixed = () => {
             <a href="https://www.producthunt.com/products/the-brief-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-the-brief-4" target="_blank" rel="noopener noreferrer" style={{ display:"inline-block", transition:"opacity 0.2s" }} onMouseEnter={e=>e.currentTarget.style.opacity="0.85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
               <img alt="The Brief | Product Hunt" width="200" height="43" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1121244&theme=dark&t=1775992143795" style={{ display:"block" }} />
             </a>
+            <a href="https://github.com/esteves7771/the-brief" target="_blank" rel="noopener noreferrer" style={{ display:"inline-block", transition:"opacity 0.2s" }} onMouseEnter={e=>e.currentTarget.style.opacity="0.85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+              <img alt="View on GitHub" height="43" src="https://img.shields.io/badge/View_on-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" style={{ display:"block" }} />
+            </a>
             <a href="https://www.paypal.com/donate/?hosted_button_id=9TG9LTUD9WFE4" target="_blank" rel="noopener noreferrer"
               style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0 1.1rem", height:43, borderRadius:6, background:"linear-gradient(135deg,#0070ba,#003087)", color:"#fff", textDecoration:"none", fontWeight:700, fontSize:"0.82rem", fontFamily:"Georgia,serif", letterSpacing:"-0.01em", transition:"opacity 0.2s, transform 0.2s", whiteSpace:"nowrap", boxShadow:"0 2px 12px rgba(0,112,186,0.3)" }}
               onMouseEnter={e=>{ e.currentTarget.style.opacity="0.9"; e.currentTarget.style.transform="translateY(-1px)"; }}
@@ -2520,6 +2572,13 @@ const buildMixed = () => {
           </div>
           <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600 }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
           <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
+          <a href="https://go.nordvpn.net/aff_c?offer_id=15&aff_id=145666&url_id=902" target="_blank" rel="noopener noreferrer sponsored"
+            style={{ display:"inline-flex", alignItems:"center", gap:"0.4rem", textDecoration:"none", opacity:0.6, transition:"opacity 0.2s" }}
+            onMouseEnter={e=>e.currentTarget.style.opacity="1"}
+            onMouseLeave={e=>e.currentTarget.style.opacity="0.6"}>
+            <span style={{ color:"#64748b", fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>🔒 Read securely. Stay private online.</span>
+            <span style={{ color:"#4687d6", fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ NordVPN</span>
+          </a>
           <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap", justifyContent:"center" }}>
             {[["About", "/about.html"], ["Contact", "/contact.html"], ["Privacy Policy", "/privacy.html"]].map(([label, href]) => (
               <a key={href} href={href} style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", textDecoration:"none", textTransform:"uppercase", transition:"color 0.2s" }}
