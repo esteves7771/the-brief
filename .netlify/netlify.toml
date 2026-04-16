@@ -39,6 +39,54 @@ Access-Control-Allow-Methods = "GET, OPTIONS"
 Access-Control-Allow-Headers = "Content-Type"
 
 [[redirects]]
+from = "/contact"
+to = "/contact.html"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/contact-us"
+to = "/contact.html"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/about"
+to = "/about.html"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/privacy"
+to = "/privacy.html"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
 from = "/api/*"
 to = "/.netlify/functions/:splat"
 status = 200.0
