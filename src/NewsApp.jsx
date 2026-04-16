@@ -759,24 +759,27 @@ function clearExpiredCache() {
 function shareArticle(article, platform = "default") {
   const shareText = `${article.title} — via The Brief`;
   const articleUrl = article.url || "";
-
-  // Generate a short key and store metadata in sessionStorage
-  // This keeps the shared URL clean: thebriefnews.org/?a=abc123
-  // instead of a massive encoded URL
   let shareUrl = "https://thebriefnews.org";
+
   if (articleUrl) {
-    // Encode full URL as base64 so any device can recover it
-    const key = btoa(unescape(encodeURIComponent(articleUrl))).replace(/[+/=]/g, c => ({"+":"_","/":"-","=":""})[c]);
+    // Encode all metadata directly in the URL so any device gets the full article card
+    // Compact: JSON → base64url — self-contained, no sessionStorage needed
     try {
-      sessionStorage.setItem("tb_" + key.slice(0, 12), JSON.stringify({
-        title:       article.title || "",
-        description: article.description || "",
-        source:      article.source || "",
-        image:       article.image || "",
-        url:         articleUrl,
-      }));
-    } catch {}
-    shareUrl = `https://thebriefnews.org/?a=${key}`;
+      const payload = JSON.stringify({
+        u: articleUrl,
+        t: (article.title || "").slice(0, 120),
+        d: (article.description || "").slice(0, 200),
+        s: article.source || "",
+        i: article.image || "",
+      });
+      const encoded = btoa(unescape(encodeURIComponent(payload)))
+        .replace(/[+/=]/g, c => ({"+":"_","/":"-","=":""})[c]);
+      shareUrl = `https://thebriefnews.org/?s=${encoded}`;
+    } catch {
+      // fallback — just the URL encoded
+      const key = btoa(unescape(encodeURIComponent(articleUrl))).replace(/[+/=]/g, c => ({"+":"_","/":"-","=":""})[c]);
+      shareUrl = `https://thebriefnews.org/?a=${key}`;
+    }
   }
 
   const fullText = `${shareText}\n${shareUrl}`;
@@ -894,7 +897,7 @@ function BiasDot({ source }) {
     <div style={{ position:"relative", display:"inline-flex", alignItems:"center" }} onMouseEnter={()=>setShowTip(true)} onMouseLeave={()=>setShowTip(false)}>
       <div style={{ width:7, height:7, borderRadius:"50%", background:style.color, border:`1.5px solid ${style.color}`, opacity:0.85, cursor:"default", flexShrink:0 }} />
       {showTip && (
-        <div style={{ position:"absolute", bottom:"calc(100% + 5px)", left:"50%", transform:"translateX(-50%)", background:"rgba(0,0,0,0.85)", color:"#fff", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", padding:"4px 8px", borderRadius:4, whiteSpace:"nowrap", zIndex:10, pointerEvents:"none" }}>
+        <div style={{ position:"absolute", bottom:"calc(100% + 5px)", left:"50%", transform:"translateX(-50%)", background:"rgba(0,0,0,0.85)", color:"#fff", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.08em", padding:"4px 8px", borderRadius:4, whiteSpace:"nowrap", zIndex:10, pointerEvents:"none" }}>
           {style.label} · AllSides
           <div style={{ position:"absolute", bottom:-4, left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"4px solid transparent", borderRight:"4px solid transparent", borderTop:"4px solid rgba(0,0,0,0.85)" }} />
         </div>
@@ -932,7 +935,7 @@ function ShareMenu({ article, th, onClose, btnRef }) {
   const btn = (label, icon, action) => (
     <button
       onClick={e => { e.stopPropagation(); shareArticle(article, action); onClose(); }}
-      style={{ display:"flex", alignItems:"center", gap:"0.65rem", background:"transparent", border:"none", color:"inherit", cursor:"pointer", padding:"0.6rem 1rem", width:"100%", textAlign:"left", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem", letterSpacing:"0.06em", transition:"background 0.15s" }}
+      style={{ display:"flex", alignItems:"center", gap:"0.65rem", background:"transparent", border:"none", color:"inherit", cursor:"pointer", padding:"0.6rem 1rem", width:"100%", textAlign:"left", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.68rem", letterSpacing:"0.06em", transition:"background 0.15s" }}
       onMouseEnter={e=>e.currentTarget.style.background=th.accentBg}
       onMouseLeave={e=>e.currentTarget.style.background="transparent"}
     >
@@ -955,7 +958,7 @@ function ShareMenu({ article, th, onClose, btnRef }) {
             <div style={{ width:36, height:4, borderRadius:2, background:th.border }} />
           </div>
           <div style={{ padding:"0.4rem 1.25rem 0.75rem", borderBottom:`1px solid ${th.border}` }}>
-            <p style={{ color:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", textAlign:"center" }}>Share story</p>
+            <p style={{ color:th.textMuted, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", textAlign:"center" }}>Share story</p>
           </div>
           {btn("WhatsApp",  "💬", "whatsapp")}
           {btn("Post on X", "𝕏",  "twitter")}
@@ -987,7 +990,7 @@ function ShareMenu({ article, th, onClose, btnRef }) {
       }}
     >
       <div style={{ padding:"0.4rem 1rem", borderBottom:`1px solid ${th.border}` }}>
-        <p style={{ color:th.textMuted, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase" }}>Share story</p>
+        <p style={{ color:th.textMuted, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase" }}>Share story</p>
       </div>
       {btn("WhatsApp",  "💬", "whatsapp")}
       {btn("Post on X", "𝕏",  "twitter")}
@@ -1011,11 +1014,11 @@ function VideoPlayer({ video, onClose, th }) {
       <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:"min(900px,96vw)", zIndex:201, display:"flex", flexDirection:"column", animation:"popIn 0.3s cubic-bezier(0.16,1,0.3,1)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0.75rem 0", marginBottom:"0.5rem" }}>
           <div style={{ flex:1, minWidth:0 }}>
-            <p style={{ color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", marginBottom:"0.25rem" }}>{video.source}</p>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.1rem)", fontWeight:700, color:"#f8fafc", lineHeight:1.3, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{video.title}</h2>
+            <p style={{ color:th.accent, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", marginBottom:"0.25rem" }}>{video.source}</p>
+            <h2 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"clamp(0.9rem,2vw,1.1rem)", fontWeight:700, color:"#f8fafc", lineHeight:1.3, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{video.title}</h2>
           </div>
           <div style={{ display:"flex", gap:"0.5rem", marginLeft:"1rem", flexShrink:0 }}>
-            <a href={video.url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", padding:"5px 10px", borderRadius:4, textDecoration:"none" }}>YT ↗</a>
+            <a href={video.url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", padding:"5px 10px", borderRadius:4, textDecoration:"none" }}>YT ↗</a>
             <button onClick={onClose} style={{ background:"rgba(255,255,255,0.1)", border:"none", color:"#fff", cursor:"pointer", fontSize:"0.9rem", padding:"5px 10px", borderRadius:4 }}>✕</button>
           </div>
         </div>
@@ -1039,16 +1042,16 @@ function VideoCard({ video, index, onClick, th }) {
           <div style={{ width:44, height:44, borderRadius:"50%", background:hovered?th.accent:"rgba(255,255,255,0.9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.1rem", transition:"all 0.2s", transform:hovered?"scale(1.1)":"scale(1)" }}>▶</div>
         </div>
         <div style={{ position:"absolute", bottom:8, right:8, background:"rgba(0,0,0,0.7)", borderRadius:3, padding:"2px 6px" }}>
-          <span style={{ color:"#fff", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>▶ VIDEO</span>
+          <span style={{ color:"#fff", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace" }}>▶ VIDEO</span>
         </div>
       </div>
       <div style={{ padding:"0.9rem 1rem", display:"flex", flexDirection:"column", gap:"0.4rem", flex:1 }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <span style={{ color:th.accent, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", background:th.accentBg, border:`1px solid ${th.accentBord}`, padding:"2px 6px", borderRadius:3 }}>📺 {video.source}</span>
-          <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace" }}>{timeAgo(video.publishedAt)}</span>
+          <span style={{ color:th.accent, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", background:th.accentBg, border:`1px solid ${th.accentBord}`, padding:"2px 6px", borderRadius:3 }}>📺 {video.source}</span>
+          <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace" }}>{timeAgo(video.publishedAt)}</span>
         </div>
-        <h3 style={{ fontFamily:"'Playfair Display',Georgia,serif", fontSize:"0.9rem", fontWeight:600, color:th.textHead, lineHeight:1.3, margin:0, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{video.title}</h3>
-        <div style={{ color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s", marginTop:"auto" }}>WATCH VIDEO →</div>
+        <h3 style={{ fontFamily:"'Instrument Serif',Georgia,serif", fontSize:"0.9rem", fontWeight:600, color:th.textHead, lineHeight:1.3, margin:0, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{video.title}</h3>
+        <div style={{ color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s", marginTop:"auto" }}>WATCH VIDEO →</div>
       </div>
     </article>
   );
@@ -1110,12 +1113,12 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
       {/* Meta row */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:"0.5rem" }}>
         <div style={{ display:"flex", gap:"0.45rem", alignItems:"center", flexWrap:"wrap" }}>
-          {featured && <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", letterSpacing:"0.14em", padding:"2px 7px", fontFamily:"'DM Mono',monospace", textTransform:"uppercase" }}>◈ FEATURED</span>}
-          <span style={{ color:th.textSource, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.05em" }}>{article.source}</span>
+          {featured && <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", letterSpacing:"0.14em", padding:"2px 7px", fontFamily:"'JetBrains Mono',monospace", textTransform:"uppercase" }}>◈ FEATURED</span>}
+          <span style={{ color:th.textSource, fontSize:"0.62rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.05em" }}>{article.source}</span>
           <BiasDot source={article.source} />
           <CountryFlag title={article.title} source={article.source} />
         </div>
-        <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", whiteSpace:"nowrap" }}>{timeAgo(article.publishedAt)}</span>
+        <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", whiteSpace:"nowrap" }}>{timeAgo(article.publishedAt)}</span>
       </div>
 
       {/* Featured image */}
@@ -1126,17 +1129,17 @@ function NewsCard({ article, featured, index, onClick, th, bookmarks, onBookmark
       )}
 
       {/* Headline */}
-      <h2 style={{ fontFamily:"'Playfair Display',Georgia,serif", fontSize:featured?"clamp(1.05rem,2.2vw,1.45rem)":"clamp(0.88rem,1.8vw,0.96rem)", fontWeight:featured?700:600, color:th.textHead, lineHeight:1.3, margin:0, letterSpacing:"-0.01em" }}>{article.title}</h2>
+      <h2 style={{ fontFamily:"'Bahnschrift','DIN Next','DIN Pro','Arial Nova',system-ui,sans-serif", fontSize:featured?"clamp(1.15rem,2.4vw,1.55rem)":"clamp(0.98rem,2vw,1.06rem)", fontWeight:600, color:th.textHead, lineHeight:1.3, margin:0, letterSpacing:"-0.01em" }}>{article.title}</h2>
 
       {/* Description */}
-      {article.description && <p style={{ color:th.textBody, fontSize:featured?"0.85rem":"0.76rem", lineHeight:1.7, fontFamily:"'Lora',serif", margin:0, display:"-webkit-box", WebkitLineClamp:featured?3:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{article.description}</p>}
+      {article.description && <p style={{ color:th.textBody, fontSize:featured?"0.91rem":"0.82rem", lineHeight:1.7, fontFamily:"'Source Serif 4',serif", margin:0, display:"-webkit-box", WebkitLineClamp:featured?3:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{article.description}</p>}
 
       {/* Action row */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:"auto" }}>
-        <div style={{ color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s" }}>READ STORY →</div>
+        <div style={{ color:hovered?th.accent:th.textMuted, fontSize:"0.62rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", transition:"color 0.2s" }}>READ STORY →</div>
         <div style={{ display:"flex", gap:"0.4rem", position:"relative" }}>
-          <button ref={shareBtnRef} onClick={handleShareClick} title="Share this story" style={{ background:"transparent", border:`1px solid ${th.accentBord}`, color:th.accent, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", transition:"all 0.2s", display:"flex", alignItems:"center", gap:"0.3rem" }} onMouseEnter={e=>e.currentTarget.style.background=th.accentBg} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span>↗</span><span>SHARE</span></button>
-          <button onClick={handleBookmark} title={isBookmarked?"Remove bookmark":"Save for later"} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${th.accentBord}`, color:th.accent, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", transition:"all 0.2s", display:"flex", alignItems:"center", gap:"0.3rem" }} onMouseEnter={e=>e.currentTarget.style.background=th.accentBg} onMouseLeave={e=>{ if(!isBookmarked) e.currentTarget.style.background="transparent"; }}><span>🔖</span><span>{isBookmarked?"SAVED":"SAVE FOR LATER"}</span></button>
+          <button ref={shareBtnRef} onClick={handleShareClick} title="Share this story" style={{ background:"transparent", border:`1px solid ${th.accentBord}`, color:th.accent, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.06em", transition:"all 0.2s", display:"flex", alignItems:"center", gap:"0.3rem" }} onMouseEnter={e=>e.currentTarget.style.background=th.accentBg} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span>↗</span><span>SHARE</span></button>
+          <button onClick={handleBookmark} title={isBookmarked?"Remove bookmark":"Save for later"} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${th.accentBord}`, color:th.accent, borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.06em", transition:"all 0.2s", display:"flex", alignItems:"center", gap:"0.3rem" }} onMouseEnter={e=>e.currentTarget.style.background=th.accentBg} onMouseLeave={e=>{ if(!isBookmarked) e.currentTarget.style.background="transparent"; }}><span>🔖</span><span>{isBookmarked?"SAVED":"SAVE FOR LATER"}</span></button>
           {showShare && <ShareMenu article={article} th={th} onClose={()=>setShowShare(false)} btnRef={shareBtnRef} />}
         </div>
       </div>
@@ -1150,12 +1153,12 @@ function TrendingBar({ topics, activeFilter, onFilter, th }) {
   return (
     <div style={{ borderBottom:`1px solid ${th.borderSub}`, padding:"0.5rem 0", overflowX:"auto", scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:"0.4rem", alignItems:"center", flexWrap:"wrap", justifyContent:"center" }} className="trending-inner">
-        <span style={{ color:th.textMuted, fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em", flexShrink:0 }}>TRENDING</span>
+        <span style={{ color:th.textMuted, fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.14em", flexShrink:0 }}>TRENDING</span>
         {activeFilter && (
-          <button onClick={() => onFilter(null)} style={{ background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", color:"#f87171", borderRadius:20, padding:"3px 10px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", flexShrink:0, display:"flex", alignItems:"center", gap:"0.3rem" }}>✕ {activeFilter}</button>
+          <button onClick={() => onFilter(null)} style={{ background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", color:"#f87171", borderRadius:20, padding:"3px 10px", cursor:"pointer", fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.06em", flexShrink:0, display:"flex", alignItems:"center", gap:"0.3rem" }}>✕ {activeFilter}</button>
         )}
         {topics.map(topic => (
-          <button key={topic} onClick={() => onFilter(activeFilter === topic ? null : topic)} style={{ background: activeFilter===topic ? th.accentBg : th.bgInput, border:`1px solid ${activeFilter===topic ? th.accentBord : th.border}`, color: activeFilter===topic ? th.accent : th.text, borderRadius:20, padding:"3px 12px", cursor:"pointer", fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0 }}>
+          <button key={topic} onClick={() => onFilter(activeFilter === topic ? null : topic)} style={{ background: activeFilter===topic ? th.accentBg : th.bgInput, border:`1px solid ${activeFilter===topic ? th.accentBord : th.border}`, color: activeFilter===topic ? th.accent : th.text, borderRadius:20, padding:"3px 12px", cursor:"pointer", fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0 }}>
             {topic}
           </button>
         ))}
@@ -1175,12 +1178,12 @@ function BreakingBanner({ article, newCount, onClick, th }) {
           <div style={{ width:8, height:8, borderRadius:"50%", background:"#ef4444" }} />
           <div style={{ position:"absolute", inset:"-3px", borderRadius:"50%", border:"1px solid rgba(239,68,68,0.4)", animation:"ping 1.5s ease-in-out infinite" }} />
         </div>
-        <span style={{ color:"#ef4444", fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.16em", textTransform:"uppercase", flexShrink:0 }}>Breaking</span>
+        <span style={{ color:"#ef4444", fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.16em", textTransform:"uppercase", flexShrink:0 }}>Breaking</span>
         {newCount > 0 && (
-          <span style={{ background:"#ef4444", color:"#fff", fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 6px", flexShrink:0 }}>{newCount} new</span>
+          <span style={{ background:"#ef4444", color:"#fff", fontSize:"0.48rem", fontFamily:"'JetBrains Mono',monospace", borderRadius:10, padding:"1px 6px", flexShrink:0 }}>{newCount} new</span>
         )}
-        <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Playfair Display',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>{article.title}</p>
-        <span style={{ color:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", flexShrink:0 }}>{timeAgo(article.publishedAt)}</span>
+        <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Instrument Serif',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>{article.title}</p>
+        <span style={{ color:th.textMuted, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", flexShrink:0 }}>{timeAgo(article.publishedAt)}</span>
         <button onClick={e=>{e.stopPropagation();setVisible(false);}} style={{ background:"transparent", border:"none", color:"rgba(239,68,68,0.5)", cursor:"pointer", fontSize:"0.75rem", padding:"0 4px", flexShrink:0 }}>✕</button>
       </div>
     </div>
@@ -1216,13 +1219,13 @@ function InAppBrowser({ url, onClose, th }) {
           </div>
           <div style={{ flex:1, minWidth:0, background:th.bgInput, border:`1px solid ${th.border}`, borderRadius:5, padding:"0.28rem 0.7rem", display:"flex", alignItems:"center", gap:"0.4rem" }}>
             <span style={{ fontSize:"0.65rem" }}>🔒</span>
-            <span style={{ color:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{url}</span>
+            <span style={{ color:th.textMuted, fontSize:"0.62rem", fontFamily:"'JetBrains Mono',monospace", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{url}</span>
           </div>
           <div style={{ display:"flex", gap:"0.4rem", alignItems:"center", flexShrink:0 }}>
             {[15,17,19].map((s,i)=>(
-              <button key={s} onClick={()=>setFontSize(s)} style={{ background:fontSize===s?th.accentBg:"transparent", border:`1px solid ${fontSize===s?th.accentBord:th.border}`, color:fontSize===s?th.accent:th.textMuted, borderRadius:3, padding:"2px 7px", fontSize:"0.58rem", cursor:"pointer", fontFamily:"'DM Mono',monospace" }}>A{["","·","··"][i]}</button>
+              <button key={s} onClick={()=>setFontSize(s)} style={{ background:fontSize===s?th.accentBg:"transparent", border:`1px solid ${fontSize===s?th.accentBord:th.border}`, color:fontSize===s?th.accent:th.textMuted, borderRadius:3, padding:"2px 7px", fontSize:"0.58rem", cursor:"pointer", fontFamily:"'JetBrains Mono',monospace" }}>A{["","·","··"][i]}</button>
             ))}
-            <a href={url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", padding:"4px 9px", borderRadius:4, textDecoration:"none" }}>OPEN ↗</a>
+            <a href={url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", padding:"4px 9px", borderRadius:4, textDecoration:"none" }}>OPEN ↗</a>
             <button onClick={onClose} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", fontSize:"0.82rem", padding:"3px 8px", borderRadius:4 }}>✕</button>
           </div>
         </div>
@@ -1232,23 +1235,23 @@ function InAppBrowser({ url, onClose, th }) {
           {status==="error" && (
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"60vh", gap:"1.25rem", textAlign:"center" }}>
               <span style={{ fontSize:"2.5rem" }}>⚠️</span>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", color:th.textHead, fontSize:"1.1rem", fontWeight:700 }}>Couldn't extract this article</h3>
-              <a href={url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.7rem 1.4rem", borderRadius:5, textDecoration:"none", fontFamily:"'DM Mono',monospace", fontSize:"0.7rem" }}>READ ON SOURCE ↗</a>
+              <h3 style={{ fontFamily:"'Instrument Serif',serif", color:th.textHead, fontSize:"1.1rem", fontWeight:700 }}>Couldn't extract this article</h3>
+              <a href={url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.7rem 1.4rem", borderRadius:5, textDecoration:"none", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.7rem" }}>READ ON SOURCE ↗</a>
             </div>
           )}
           {status==="success" && article && (
             <div style={{ maxWidth:640, margin:"0 auto" }}>
               <div style={{ display:"flex", gap:"0.6rem", alignItems:"center", flexWrap:"wrap", marginBottom:"1.25rem" }}>
-                {article.siteName && <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"3px 9px", textTransform:"uppercase" }}>{article.siteName}</span>}
-                {article.author && <span style={{ color:th.textMuted, fontSize:"0.65rem", fontFamily:"'DM Mono',monospace" }}>By {article.author}</span>}
+                {article.siteName && <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", padding:"3px 9px", textTransform:"uppercase" }}>{article.siteName}</span>}
+                {article.author && <span style={{ color:th.textMuted, fontSize:"0.65rem", fontFamily:"'JetBrains Mono',monospace" }}>By {article.author}</span>}
               </div>
-              <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.4rem,3.5vw,2rem)", fontWeight:700, color:th.textHead, lineHeight:1.22, marginBottom:"1.5rem" }}>{article.title}</h1>
+              <h1 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"clamp(1.4rem,3.5vw,2rem)", fontWeight:700, color:th.textHead, lineHeight:1.22, marginBottom:"1.5rem" }}>{article.title}</h1>
               {article.image && <div style={{ borderRadius:8, overflow:"hidden", marginBottom:"1.75rem" }}><img src={article.image} alt="" onError={e=>{e.target.parentElement.style.display="none";}} style={{ width:"100%", display:"block", maxHeight:400, objectFit:"cover" }} /></div>}
-              <div style={{ fontFamily:"'Lora',serif", fontSize:`${fontSize}px`, color:th.textBody, lineHeight:1.9 }}>
+              <div style={{ fontFamily:"'Source Serif 4',serif", fontSize:`${fontSize}px`, color:th.textBody, lineHeight:1.9 }}>
                 {article.text ? article.text.split("\n\n").filter(p=>p.trim()).map((p,i)=><p key={i} style={{ marginBottom:"1.2em" }}>{p}</p>) : <p style={{ color:th.textMuted }}>No text could be extracted.</p>}
               </div>
               <div style={{ borderTop:`1px solid ${th.borderSub}`, marginTop:"2.5rem", paddingTop:"1.25rem", display:"flex", gap:"0.75rem", flexWrap:"wrap" }}>
-                <a href={url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.55rem 1.1rem", borderRadius:4, textDecoration:"none", fontFamily:"'DM Mono',monospace", fontSize:"0.65rem" }}>VIEW ORIGINAL ↗</a>
+                <a href={url} target="_blank" rel="noopener noreferrer" style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.55rem 1.1rem", borderRadius:4, textDecoration:"none", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.65rem" }}>VIEW ORIGINAL ↗</a>
               </div>
             </div>
           )}
@@ -1271,14 +1274,14 @@ function RelatedStories({ article, allArticles, onClick, th }) {
   if (!related.length) return null;
   return (
     <div style={{ borderTop:`1px solid ${th.borderSub}`, marginTop:"2rem", paddingTop:"1.5rem" }}>
-      <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.9rem", fontWeight:700, color:th.textHead, marginBottom:"1rem", letterSpacing:"-0.01em" }}>Related Stories</h3>
+      <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.9rem", fontWeight:700, color:th.textHead, marginBottom:"1rem", letterSpacing:"-0.01em" }}>Related Stories</h3>
       <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem" }}>
         {related.map(a => (
           <div key={a.id} onClick={() => onClick(a)} style={{ display:"flex", gap:"0.75rem", alignItems:"flex-start", cursor:"pointer", padding:"0.5rem", borderRadius:5, transition:"background 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background=th.bgInput} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
             {a.image && <div style={{ width:60, height:45, borderRadius:4, overflow:"hidden", flexShrink:0, background:th.bgSkeleton1 }}><img src={a.image} alt="" loading="lazy" onError={e=>{e.target.parentElement.style.display="none";}} style={{ width:"100%", height:"100%", objectFit:"cover" }} /></div>}
             <div style={{ flex:1, minWidth:0 }}>
-              <p style={{ color:th.textSource, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", marginBottom:"0.2rem" }}>{a.source}</p>
-              <p style={{ color:th.textHead, fontSize:"0.8rem", fontFamily:"'Playfair Display',serif", fontWeight:600, lineHeight:1.3, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.title}</p>
+              <p style={{ color:th.textSource, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", marginBottom:"0.2rem" }}>{a.source}</p>
+              <p style={{ color:th.textHead, fontSize:"0.8rem", fontFamily:"'Instrument Serif',serif", fontWeight:600, lineHeight:1.3, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.title}</p>
             </div>
           </div>
         ))}
@@ -1310,42 +1313,42 @@ function ReaderPanel({ article, onClose, th, bookmarks, onBookmark, allArticles,
         {/* Header */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0.9rem 1.25rem", borderBottom:`1px solid ${th.border}`, position:"sticky", top:0, background:th.bgReader, zIndex:1, gap:"0.75rem", flexWrap:"wrap" }}>
           <div style={{ display:"flex", gap:"0.4rem", alignItems:"center" }}>
-            <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em" }}>SIZE</span>
+            <span style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em" }}>SIZE</span>
             {[14,16,18,20].map((s,i)=>(
-              <button key={s} onClick={()=>setFontSize(s)} style={{ background:fontSize===s?th.accentBg:"transparent", border:`1px solid ${fontSize===s?th.accentBord:th.border}`, color:fontSize===s?th.accent:th.textMuted, borderRadius:3, padding:"2px 7px", fontSize:"0.6rem", cursor:"pointer", fontFamily:"'DM Mono',monospace" }}>A{["","·","··","···"][i]}</button>
+              <button key={s} onClick={()=>setFontSize(s)} style={{ background:fontSize===s?th.accentBg:"transparent", border:`1px solid ${fontSize===s?th.accentBord:th.border}`, color:fontSize===s?th.accent:th.textMuted, borderRadius:3, padding:"2px 7px", fontSize:"0.6rem", cursor:"pointer", fontFamily:"'JetBrains Mono',monospace" }}>A{["","·","··","···"][i]}</button>
             ))}
           </div>
           <div style={{ display:"flex", gap:"0.5rem", alignItems:"center", flexWrap:"wrap", position:"relative" }}>
-            <button onClick={()=>onBookmark(article)} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s" }}>{isBookmarked?"🔖 SAVED":"🔖 SAVE FOR LATER"}</button>
-            <button ref={shareBtnRef} onClick={()=>setShowShare(s=>!s)} style={{ background:showShare?th.accentBg:"transparent", border:`1px solid ${showShare?th.accentBord:th.border}`, color:showShare?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s" }}>⇪ SHARE STORY</button>
+            <button onClick={()=>onBookmark(article)} style={{ background:isBookmarked?th.accentBg:"transparent", border:`1px solid ${isBookmarked?th.accentBord:th.border}`, color:isBookmarked?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s" }}>{isBookmarked?"🔖 SAVED":"🔖 SAVE FOR LATER"}</button>
+            <button ref={shareBtnRef} onClick={()=>setShowShare(s=>!s)} style={{ background:showShare?th.accentBg:"transparent", border:`1px solid ${showShare?th.accentBord:th.border}`, color:showShare?th.accent:th.textMuted, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.2s" }}>⇪ SHARE STORY</button>
             {showShare && <ShareMenu article={article} th={th} onClose={()=>setShowShare(false)} btnRef={shareBtnRef} />}
-            <button onClick={()=>setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap" }}>⬡ READ IN-APP</button>
-            <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ color:th.textSource, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", textDecoration:"none", border:`1px solid ${th.border}`, padding:"4px 10px", borderRadius:3, whiteSpace:"nowrap" }}>SOURCE ↗</a>
+            <button onClick={()=>setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", padding:"4px 10px", borderRadius:3, cursor:"pointer", whiteSpace:"nowrap" }}>⬡ READ IN-APP</button>
+            <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ color:th.textSource, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", textDecoration:"none", border:`1px solid ${th.border}`, padding:"4px 10px", borderRadius:3, whiteSpace:"nowrap" }}>SOURCE ↗</a>
             <button onClick={onClose} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", fontSize:"0.85rem", padding:"4px 9px", borderRadius:3 }}>✕</button>
           </div>
         </div>
         {/* Content */}
         <div style={{ padding:"2rem 1.75rem", flex:1 }}>
           <div style={{ display:"flex", gap:"0.6rem", alignItems:"center", marginBottom:"1.25rem", flexWrap:"wrap" }}>
-            <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", padding:"3px 9px", textTransform:"uppercase" }}>{article.source}</span>
+            <span style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", padding:"3px 9px", textTransform:"uppercase" }}>{article.source}</span>
             <BiasDot source={article.source} />
             <CountryFlag title={article.title} source={article.source} />
-            <span style={{ color:th.textMuted, fontSize:"0.62rem", fontFamily:"'DM Mono',monospace" }}>{timeAgo(article.publishedAt)}</span>
+            <span style={{ color:th.textMuted, fontSize:"0.62rem", fontFamily:"'JetBrains Mono',monospace" }}>{timeAgo(article.publishedAt)}</span>
           </div>
-          <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,4vw,1.9rem)", fontWeight:700, color:th.textHead, lineHeight:1.22, marginBottom:"1.5rem", letterSpacing:"-0.02em" }}>{article.title}</h1>
+          <h1 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"clamp(1.3rem,4vw,1.9rem)", fontWeight:700, color:th.textHead, lineHeight:1.22, marginBottom:"1.5rem", letterSpacing:"-0.02em" }}>{article.title}</h1>
           {article.image && <div style={{ borderRadius:5, overflow:"hidden", marginBottom:"1.75rem", border:`1px solid ${th.border}` }}><img src={article.image} alt="" onError={e=>{e.target.parentElement.style.display="none";}} style={{ width:"100%", display:"block", maxHeight:360, objectFit:"cover" }} /></div>}
-          <p style={{ fontFamily:"'Lora',serif", fontSize:`${fontSize}px`, color:th.textBody, lineHeight:1.85, marginBottom:"2rem" }}>{article.description || "Full article available at the original source."}</p>
+          <p style={{ fontFamily:"'Source Serif 4',serif", fontSize:`${fontSize}px`, color:th.textBody, lineHeight:1.85, marginBottom:"2rem" }}>{article.description || "Full article available at the original source."}</p>
           <div style={{ borderTop:`1px solid ${th.borderSub}`, paddingTop:"1.25rem", display:"flex", gap:"0.75rem", flexWrap:"wrap" }}>
-            <button onClick={()=>setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.65rem 1.25rem", borderRadius:4, cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem" }}>⬡ READ IN-APP</button>
-            <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.65rem 1.25rem", borderRadius:4, textDecoration:"none", fontFamily:"'DM Mono',monospace", fontSize:"0.68rem" }}>OPEN IN BROWSER ↗</a>
+            <button onClick={()=>setShowBrowser(true)} style={{ background:th.accentBg, border:`1px solid ${th.accentBord}`, color:th.accent, padding:"0.65rem 1.25rem", borderRadius:4, cursor:"pointer", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.68rem" }}>⬡ READ IN-APP</button>
+            <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ display:"inline-flex", alignItems:"center", background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.65rem 1.25rem", borderRadius:4, textDecoration:"none", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.68rem" }}>OPEN IN BROWSER ↗</a>
           </div>
           <div style={{ marginTop:"1.25rem", paddingTop:"1rem", borderTop:`1px solid ${th.borderSub}` }}>
             <a href="https://go.nordpass.io/aff_c?offer_id=488&aff_id=145666&url_id=9356" target="_blank" rel="noopener noreferrer sponsored"
               style={{ display:"inline-flex", alignItems:"center", gap:"0.4rem", textDecoration:"none", opacity:0.65, transition:"opacity 0.2s" }}
               onMouseEnter={e=>e.currentTarget.style.opacity="1"}
               onMouseLeave={e=>e.currentTarget.style.opacity="0.65"}>
-              <span style={{ color:"#64748b", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>🔒 Keep your accounts secure while reading news.</span>
-              <span style={{ color:"#4687d6", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ NordPass</span>
+              <span style={{ color:"#64748b", fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em" }}>🔒 Keep your accounts secure while reading news.</span>
+              <span style={{ color:"#4687d6", fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ NordPass</span>
             </a>
           </div>
           {/* Related stories */}
@@ -1382,8 +1385,8 @@ function NordStrip({ category, th }) {
         style={{ display:"flex", alignItems:"center", gap:"0.4rem", textDecoration:"none", transition:"opacity 0.2s" }}
         onMouseEnter={e=>e.currentTarget.style.opacity="0.7"}
         onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
-        <span style={{ color:"#64748b", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>{copy}</span>
-        <span style={{ color:"#4687d6", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ {product}</span>
+        <span style={{ color:"#64748b", fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em" }}>{copy}</span>
+        <span style={{ color:"#4687d6", fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ {product}</span>
       </a>
     </div>
   );
@@ -1394,7 +1397,7 @@ function ThemeToggle({ night, onToggle, th }) {
   return (
     <button onClick={onToggle} title={night?"Switch to Day":"Switch to Night"} style={{ display:"flex", alignItems:"center", gap:"0.4rem", background:th.accentBg, border:`1px solid ${th.accentBord}`, borderRadius:20, padding:"0.28rem 0.7rem", cursor:"pointer", transition:"all 0.2s", flexShrink:0 }}>
       <span style={{ fontSize:"0.8rem", lineHeight:1 }}>{night?"☀️":"🌙"}</span>
-      <span style={{ color:th.accent, fontSize:"0.56rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em" }} className="toggle-label">{night?"DAY":"NIGHT"}</span>
+      <span style={{ color:th.accent, fontSize:"0.56rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em" }} className="toggle-label">{night?"DAY":"NIGHT"}</span>
     </button>
   );
 }
@@ -1405,7 +1408,7 @@ function WeatherWidget({ weather, th }) {
   return (
     <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", background:th.accentBg, border:`1px solid ${th.accentBord}`, borderRadius:20, padding:"0.25rem 0.75rem", flexShrink:0, animation:"fadeIn 0.4s ease" }}>
       <span style={{ fontSize:"0.9rem", lineHeight:1 }}>{weather.icon}</span>
-      <span style={{ color:th.accent, fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
+      <span style={{ color:th.accent, fontSize:"0.65rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.06em", whiteSpace:"nowrap" }}>
         {weather.temp}°C {weather.city && <span style={{ opacity:0.7 }}>· {weather.city}</span>}
       </span>
     </div>
@@ -1423,18 +1426,18 @@ function ContactPopup({ onClose, th }) {
       <div style={{ position:"fixed", bottom:"5rem", right:"1.5rem", background:th.bgReader, border:`1px solid ${th.border}`, borderRadius:10, padding:"1.5rem", zIndex:301, width:"min(320px,90vw)", boxShadow:"0 20px 60px rgba(0,0,0,0.4)", animation:"popUp 0.25s cubic-bezier(0.16,1,0.3,1)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1rem" }}>
           <div>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", fontWeight:700, color:th.textHead, marginBottom:"0.2rem" }}>Get in touch</h3>
-            <p style={{ color:th.textMuted, fontSize:"0.68rem", fontFamily:"'DM Mono',monospace" }}>Pedro Esteves · Developer</p>
+            <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"1rem", fontWeight:700, color:th.textHead, marginBottom:"0.2rem" }}>Get in touch</h3>
+            <p style={{ color:th.textMuted, fontSize:"0.68rem", fontFamily:"'JetBrains Mono',monospace" }}>Pedro Esteves · Developer</p>
           </div>
           <button onClick={onClose} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", fontSize:"0.8rem", padding:"3px 8px", borderRadius:3 }}>✕</button>
         </div>
         <div style={{ background:th.bgInput, border:`1px solid ${th.border}`, borderRadius:6, padding:"0.75rem 1rem", marginBottom:"0.75rem" }}>
-          <p style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", marginBottom:"0.3rem" }}>EMAIL</p>
-          <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'DM Mono',monospace", wordBreak:"break-all" }}>{CONTACT_EMAIL}</p>
+          <p style={{ color:th.textMuted, fontSize:"0.58rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", marginBottom:"0.3rem" }}>EMAIL</p>
+          <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'JetBrains Mono',monospace", wordBreak:"break-all" }}>{CONTACT_EMAIL}</p>
         </div>
         <div style={{ display:"flex", gap:"0.5rem" }}>
-          <button onClick={copyEmail} style={{ flex:1, background:copied?"rgba(74,222,128,0.1)":th.accentBg, border:`1px solid ${copied?"rgba(74,222,128,0.3)":th.accentBord}`, color:copied?"#4ade80":th.accent, cursor:"pointer", padding:"0.6rem", borderRadius:5, fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", transition:"all 0.2s" }}>{copied?"✓ COPIED":"COPY EMAIL"}</button>
-          <a href={`mailto:${CONTACT_EMAIL}`} style={{ flex:1, background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.6rem", borderRadius:5, fontFamily:"'DM Mono',monospace", fontSize:"0.65rem", textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>SEND EMAIL ↗</a>
+          <button onClick={copyEmail} style={{ flex:1, background:copied?"rgba(74,222,128,0.1)":th.accentBg, border:`1px solid ${copied?"rgba(74,222,128,0.3)":th.accentBord}`, color:copied?"#4ade80":th.accent, cursor:"pointer", padding:"0.6rem", borderRadius:5, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.65rem", transition:"all 0.2s" }}>{copied?"✓ COPIED":"COPY EMAIL"}</button>
+          <a href={`mailto:${CONTACT_EMAIL}`} style={{ flex:1, background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, padding:"0.6rem", borderRadius:5, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.65rem", textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center" }}>SEND EMAIL ↗</a>
         </div>
       </div>
     </>
@@ -1446,8 +1449,8 @@ function SavedView({ bookmarks, onClick, onBookmark, th }) {
   if (!bookmarks.length) return (
     <div style={{ textAlign:"center", padding:"5rem 1rem" }}>
       <p style={{ fontSize:"2rem", marginBottom:"1rem" }}>◇</p>
-      <p style={{ color:th.textHead, fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:700, marginBottom:"0.5rem" }}>No saved articles yet</p>
-      <p style={{ color:th.textMuted, fontFamily:"'DM Mono',monospace", fontSize:"0.7rem", letterSpacing:"0.08em" }}>Tap ◇ on any story to save it here</p>
+      <p style={{ color:th.textHead, fontFamily:"'Instrument Serif',serif", fontSize:"1.1rem", fontWeight:700, marginBottom:"0.5rem" }}>No saved articles yet</p>
+      <p style={{ color:th.textMuted, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.7rem", letterSpacing:"0.08em" }}>Tap ◇ on any story to save it here</p>
     </div>
   );
   return (
@@ -1474,7 +1477,7 @@ function MediaSectionBar({ activeSection, onSelect, th }) {
               borderRadius:  20,
               padding:       "0.3rem 0.85rem",
               cursor:        "pointer",
-              fontFamily:    "'DM Mono',monospace",
+              fontFamily:    "'JetBrains Mono',monospace",
               fontSize:      "0.6rem",
               letterSpacing: "0.06em",
               whiteSpace:    "nowrap",
@@ -1533,11 +1536,11 @@ function RadioCard({ station, th, index, onPlay }) {
       <div style={{ flex:1, minWidth:0 }}>
         <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.3rem" }}>
           <span style={{ fontSize:"0.85rem" }}>{station.country}</span>
-          <span style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase" }}>{station.genre}</span>
+          <span style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase" }}>{station.genre}</span>
         </div>
-        <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.95rem", fontWeight:700, color:th.textHead, margin:0, lineHeight:1.2 }}>{station.name}</h3>
+        <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.95rem", fontWeight:700, color:th.textHead, margin:0, lineHeight:1.2 }}>{station.name}</h3>
       </div>
-      <div style={{ flexShrink:0, color:"#ef4444", fontSize:"0.6rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", display:"flex", flexDirection:"column", alignItems:"center", gap:"0.2rem" }}>
+      <div style={{ flexShrink:0, color:"#ef4444", fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", display:"flex", flexDirection:"column", alignItems:"center", gap:"0.2rem" }}>
         <div style={{ width:28, height:28, borderRadius:"50%", background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.8rem" }}>▶</div>
         <span style={{ fontSize:"0.48rem" }}>PLAY</span>
       </div>
@@ -1689,7 +1692,7 @@ function PodcastView({ th, onPlay }) {
   );
 
   if (!loading && episodes.length === 0) return (
-    <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em", lineHeight:2 }}>
+    <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em", lineHeight:2 }}>
       <div style={{ fontSize:"2rem", marginBottom:"1rem" }}>🎙</div>
       <div>NO EPISODES FOUND</div>
       <div style={{ fontSize:"0.6rem", marginTop:"0.5rem", opacity:0.6 }}>PODCASTS LOADING MAY TAKE A MOMENT</div>
@@ -1737,12 +1740,12 @@ function PodcastCard({ episode, th, index, onPlay }) {
         }
       </div>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:"0.3rem", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{episode.podcast}</p>
-        <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, margin:"0 0 0.4rem", lineHeight:1.25, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{episode.title}</h3>
+        <p style={{ color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:"0.3rem", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{episode.podcast}</p>
+        <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, margin:"0 0 0.4rem", lineHeight:1.25, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{episode.title}</h3>
         <div style={{ display:"flex", alignItems:"center", gap:"0.6rem" }}>
           <div style={{ width:24, height:24, borderRadius:"50%", background:th.accentBg, border:`1px solid ${th.accentBord}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.6rem", color:th.accent, flexShrink:0 }}>▶</div>
-          {episode.duration && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>{episode.duration}</span>}
-          <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>{timeAgo(episode.publishedAt)}</span>
+          {episode.duration && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace" }}>{episode.duration}</span>}
+          <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace" }}>{timeAgo(episode.publishedAt)}</span>
         </div>
       </div>
     </div>
@@ -1838,26 +1841,26 @@ function MiniPlayer({ track, onClose, th }) {
 
         {/* Track info */}
         <div style={{ flex:1, minWidth:0 }}>
-          <p style={{ color:th.accent, fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", margin:0 }}>
+          <p style={{ color:th.accent, fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", margin:0 }}>
             {isPodcast ? (track.podcast||"Podcast") : "🔴 LIVE"}
           </p>
-          <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Playfair Display',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+          <p style={{ color:th.textHead, fontSize:"0.78rem", fontFamily:"'Instrument Serif',serif", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
             {track.name || track.title}
           </p>
         </div>
 
         {/* Time for podcasts */}
         {isPodcast && duration > 0 && (
-          <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", flexShrink:0 }}>{fmt(progress)} / {fmt(duration)}</span>
+          <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", flexShrink:0 }}>{fmt(progress)} / {fmt(duration)}</span>
         )}
 
         {/* Controls */}
         <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", flexShrink:0 }}>
-          {error && <span style={{ color:"#f87171", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>STREAM ERROR</span>}
-          {loading && !error && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", animation:"ping 1s infinite" }}>LOADING…</span>}
+          {error && <span style={{ color:"#f87171", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace" }}>STREAM ERROR</span>}
+          {loading && !error && <span style={{ color:th.textFaint, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", animation:"ping 1s infinite" }}>LOADING…</span>}
 
           {isPodcast && (
-            <button onClick={cycleSpeed} style={{ background:th.bgInput, border:`1px solid ${th.border}`, color:th.textMuted, borderRadius:4, padding:"3px 7px", cursor:"pointer", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace" }}>{speed}x</button>
+            <button onClick={cycleSpeed} style={{ background:th.bgInput, border:`1px solid ${th.border}`, color:th.textMuted, borderRadius:4, padding:"3px 7px", cursor:"pointer", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace" }}>{speed}x</button>
           )}
 
           <button
@@ -1889,7 +1892,7 @@ function LiveView({ videos, loading, onPlay, th }) {
       ))}
     </div>
   );
-  if (!videos.length) return <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em" }}>NO VIDEOS FOUND</div>;
+  if (!videos.length) return <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em" }}>NO VIDEOS FOUND</div>;
   return <div className="news-grid">{videos.map((v,i)=><VideoCard key={v.id||i} video={v} index={i} onClick={onPlay} th={th} />)}</div>;
 }
 
@@ -1901,7 +1904,7 @@ function BusinessSectionBar({ activeSection, onSelect, th }) {
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }}>
         {BUSINESS_SECTIONS.map(s => (
           <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
-            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.text, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.text, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
             {s.label}
           </button>
         ))}
@@ -1917,7 +1920,7 @@ function SportsSectionBar({ activeSection, onSelect, th }) {
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"0.45rem 1rem", display:"flex", gap:"0.5rem", flexWrap:"wrap", justifyContent:"center" }}>
         {SPORTS_SECTIONS.map(s => (
           <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
-            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.text, opacity:activeSection===s.id?1:0.65, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+            style={{ background:activeSection===s.id?th.accentBg:"transparent", border:`1px solid ${activeSection===s.id?th.accentBord:th.border}`, color:activeSection===s.id?th.accent:th.text, opacity:activeSection===s.id?1:0.65, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
             {s.label}
           </button>
         ))}
@@ -1938,7 +1941,7 @@ function VibeSectionBar({ activeSection, onSelect, th }) {
           const active = activeSection === s.id;
           return (
             <button key={s.id} onClick={e=>{ e.stopPropagation(); onSelect(s.id); }}
-              style={{ background:active?`${c}18`:"transparent", border:`1px solid ${active?c:th.border}`, color:active?c:th.text, opacity:active?1:0.65, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
+              style={{ background:active?`${c}18`:"transparent", border:`1px solid ${active?c:th.border}`, color:active?c:th.text, opacity:active?1:0.65, borderRadius:20, padding:"0.3rem 0.85rem", cursor:"pointer", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.06em", whiteSpace:"nowrap", transition:"all 0.18s", flexShrink:0, minHeight:34 }}>
               {s.label}
             </button>
           );
@@ -1964,7 +1967,7 @@ function WorldRegionBar({ activeRegion, onSelect, th }) {
               borderRadius:  20,
               padding:       "0.3rem 0.85rem",
               cursor:        "pointer",
-              fontFamily:    "'DM Mono',monospace",
+              fontFamily:    "'JetBrains Mono',monospace",
               fontSize:      "0.6rem",
               letterSpacing: "0.06em",
               whiteSpace:    "nowrap",
@@ -2006,7 +2009,8 @@ export default function NewsApp() {
   const [trendingFilter,  setTrendingFilter]  = useState(null);
   const [newStoryCount,   setNewStoryCount]   = useState(0);
   const prevTopArticleRef = useRef(null);
-  const cacheRef = useRef({});
+  const cacheRef   = useRef({});
+  const headerRef  = useRef(null);
   const th = night ? T.night : T.day;
   const weather = useWeather();
 
@@ -2017,41 +2021,78 @@ export default function NewsApp() {
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
-      const key = params.get("a");
-      if (!key) return;
 
-      // Try sessionStorage first (same device/session)
-      let meta = null;
-      try { meta = JSON.parse(sessionStorage.getItem("tb_" + key.slice(0, 12))); } catch {}
-
-      // Decode the full article URL from the base64 key (works on any device)
-      let decodedUrl = "";
-      try {
-        const b64 = key.replace(/_/g, "+").replace(/-/g, "/");
-        const padded = b64 + "==".slice(0, (4 - b64.length % 4) % 4);
-        decodedUrl = decodeURIComponent(escape(atob(padded)));
-        // Validate it looks like a URL
-        if (!decodedUrl.startsWith("http")) decodedUrl = "";
-      } catch { decodedUrl = ""; }
-
-      const articleUrl = meta?.url || decodedUrl;
-
-      if (articleUrl) {
-        setSelectedArticle({
-          id:          articleUrl,
-          title:       meta?.title || "Opening article...",
-          description: meta?.description || "",
-          url:         articleUrl,
-          image:       meta?.image || null,
-          source:      meta?.source || new URL(articleUrl).hostname.replace("www.", ""),
-          publishedAt: new Date(),
-          type:        "article",
-        });
+      // ── New format: ?s=<base64url JSON payload> ───────────────────────────
+      const s = params.get("s");
+      if (s) {
+        try {
+          const b64 = s.replace(/_/g, "+").replace(/-/g, "/");
+          const padded = b64 + "==".slice(0, (4 - b64.length % 4) % 4);
+          const payload = JSON.parse(decodeURIComponent(escape(atob(padded))));
+          if (payload?.u?.startsWith("http")) {
+            setSelectedArticle({
+              id:          payload.u,
+              title:       payload.t || payload.u,
+              description: payload.d || "",
+              url:         payload.u,
+              image:       payload.i || null,
+              source:      payload.s || new URL(payload.u).hostname.replace("www.", ""),
+              publishedAt: new Date(),
+              type:        "article",
+            });
+            window.history.replaceState({}, "", window.location.pathname);
+            return;
+          }
+        } catch {}
       }
-      // Clean URL so refresh doesn't reopen
-      window.history.replaceState({}, "", window.location.pathname);
+
+      // ── Legacy format: ?a=<base64url article URL> ─────────────────────────
+      const a = params.get("a");
+      if (a) {
+        // Try sessionStorage first (same browser session)
+        let meta = null;
+        try { meta = JSON.parse(sessionStorage.getItem("tb_" + a.slice(0, 12))); } catch {}
+
+        // Decode URL from base64
+        let decodedUrl = "";
+        try {
+          const b64 = a.replace(/_/g, "+").replace(/-/g, "/");
+          const padded = b64 + "==".slice(0, (4 - b64.length % 4) % 4);
+          decodedUrl = decodeURIComponent(escape(atob(padded)));
+          if (!decodedUrl.startsWith("http")) decodedUrl = "";
+        } catch {}
+
+        const articleUrl = meta?.url || decodedUrl;
+        if (articleUrl) {
+          setSelectedArticle({
+            id:          articleUrl,
+            title:       meta?.title || articleUrl,
+            description: meta?.description || "",
+            url:         articleUrl,
+            image:       meta?.image || null,
+            source:      meta?.source || new URL(articleUrl).hostname.replace("www.", ""),
+            publishedAt: new Date(),
+            type:        "article",
+          });
+        }
+        window.history.replaceState({}, "", window.location.pathname);
+      }
     } catch {}
   }, []);
+
+  // Measure header height and set CSS variable dynamically
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const h = headerRef.current.getBoundingClientRect().height;
+        document.documentElement.style.setProperty("--header-h", h + "px");
+      }
+    };
+    updateHeaderHeight();
+    const ro = new ResizeObserver(updateHeaderHeight);
+    if (headerRef.current) ro.observe(headerRef.current);
+    return () => ro.disconnect();
+  }, [activeCategory, activeRegion, activeBusinessSection, activeSportsSection, activeVibeSection, activeMediaSection]);
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -2262,7 +2303,7 @@ const buildMixed = () => {
   const currentVibeSection     = VIBE_SECTIONS.find(s=>s.id===activeVibeSection) || VIBE_SECTIONS[0];
 
   return (
-    <div style={{ minHeight:"100vh", background:th.bg, color:th.text, fontFamily:"'Lora',serif", transition:"background 0.3s, color 0.3s", overflowX:"hidden", width:"100%" }}>
+    <div style={{ minHeight:"100vh", background:th.bg, color:th.text, fontFamily:"'Source Serif 4',serif", transition:"background 0.3s, color 0.3s", overflowX:"hidden", width:"100%" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -2310,6 +2351,9 @@ const buildMixed = () => {
           .nord-mobile{display:none !important}
         }
         @keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+        @media(min-width:641px){
+          :root { font-size: 110%; }
+        }
         @media(max-width:420px){
           .cat-full{display:none !important}
           .cat-short{display:inline !important;font-size:0.44rem !important;letter-spacing:0.04em !important}
@@ -2320,25 +2364,25 @@ const buildMixed = () => {
       `}</style>
 
       {/* ── HEADER ── */}
-      <header style={{ borderBottom:`1px solid ${th.border}`, position:"sticky", top:0, zIndex:50, background:th.bgHeader, backdropFilter:"blur(20px)", transition:"background 0.3s" }}>
+      <header ref={headerRef} style={{ borderBottom:`1px solid ${th.border}`, position:"fixed", top:0, left:0, right:0, zIndex:50, background:th.bgHeader, backdropFilter:"blur(20px)", transition:"background 0.3s" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", justifyContent:"space-between", alignItems:"center", height:56, gap:"0.75rem" }}>
           {/* Wordmark */}
           <div style={{ display:"flex", alignItems:"baseline", gap:"0.08rem", flexShrink:0 }}>
-            <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.textHead, letterSpacing:"-0.03em" }}>The</span>
-            <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.accent, letterSpacing:"-0.03em" }}>Brief</span>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.44rem", color:th.textMuted, letterSpacing:"0.2em", marginLeft:"0.35rem", textTransform:"uppercase" }}>Live</span>
+            <span style={{ fontFamily:"'Instrument Serif',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.textHead, letterSpacing:"-0.03em" }}>The</span>
+            <span style={{ fontFamily:"'Instrument Serif',serif", fontSize:"clamp(1.1rem,3vw,1.55rem)", fontWeight:800, color:th.accent, letterSpacing:"-0.03em" }}>Brief</span>
+            <span style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:"0.44rem", color:th.textMuted, letterSpacing:"0.2em", marginLeft:"0.35rem", textTransform:"uppercase" }}>Live</span>
           </div>
           {/* Search — desktop: inline input | mobile: icon → floating overlay */}
           <div style={{ flex:1, maxWidth:260, position:"relative", display:"flex", alignItems:"center" }} className="search-desktop">
             <span style={{ position:"absolute", left:10, color:th.textMuted, fontSize:"0.85rem", pointerEvents:"none" }}>⌕</span>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." style={{ width:"100%", background:th.bgInput, border:`1px solid ${th.border}`, borderRadius:5, padding:"0.4rem 0.7rem 0.4rem 1.9rem", color:th.text, fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", transition:"border-color 0.2s" }} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." style={{ width:"100%", background:th.bgInput, border:`1px solid ${th.border}`, borderRadius:5, padding:"0.4rem 0.7rem 0.4rem 1.9rem", color:th.text, fontSize:"0.75rem", fontFamily:"'JetBrains Mono',monospace", transition:"border-color 0.2s" }} />
           </div>
           {/* Mobile search icon */}
           <button onClick={()=>setShowMobileSearch(true)} className="search-mobile" style={{ background:"transparent", border:`1px solid ${th.border}`, borderRadius:5, width:34, height:34, display:"none", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:"1rem", color:th.textMuted, flexShrink:0 }} title="Search">🔍</button>
           {/* Right controls */}
           <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexShrink:0 }}>
             <WeatherWidget weather={weather} th={th} />
-            {lastUpdated && <div className="hide-sm" style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textAlign:"right", lineHeight:1.5 }}><span style={{ display:"block" }}>UPDATED</span>{lastUpdated.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>}
+            {lastUpdated && <div className="hide-sm" style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", textAlign:"right", lineHeight:1.5 }}><span style={{ display:"block" }}>UPDATED</span>{lastUpdated.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>}
             <ThemeToggle night={night} onToggle={toggleTheme} th={th} />
           </div>
         </div>
@@ -2354,38 +2398,38 @@ const buildMixed = () => {
         {/* Category tabs */}
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1rem", display:"flex", gap:0, overflowX:"auto", borderTop:`1px solid ${th.borderTab}`, scrollbarWidth:"none" }}>
           {CATEGORIES.map(cat => (
-            <button key={cat.id} onClick={()=>handleCategoryClick(cat.id)} className="cat-tab" style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?catAccent:"transparent"}`, color:activeCategory===cat.id?catAccent:th.text, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'DM Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0, opacity:activeCategory===cat.id?1:0.65 }}>
+            <button key={cat.id} onClick={()=>handleCategoryClick(cat.id)} className="cat-tab" style={{ background:"transparent", border:"none", borderBottom:`2px solid ${activeCategory===cat.id?catAccent:"transparent"}`, color:activeCategory===cat.id?catAccent:th.text, padding:"0.65rem 0.8rem", cursor:"pointer", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", display:"flex", alignItems:"center", gap:"0.35rem", whiteSpace:"nowrap", transition:"color 0.2s, border-color 0.2s", flexShrink:0, opacity:activeCategory===cat.id?1:0.65 }}>
               <span style={{ fontSize:"0.85rem" }}>{cat.icon}</span>
               <span className="cat-label cat-full">{cat.label}</span>
               <span className="cat-label cat-short" style={{ display:"none" }}>{cat.short}</span>
               {/* Sub-section indicators */}
               {cat.id==="world" && activeCategory==="world" && activeRegion !== "world" && (
-                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
+                <span style={{ fontSize:"0.48rem", fontFamily:"'JetBrains Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
                   {WORLD_REGIONS.find(r=>r.id===activeRegion)?.short}
                 </span>
               )}
               {cat.id==="sports" && activeCategory==="sports" && activeSportsSection !== "sports" && (
-                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
+                <span style={{ fontSize:"0.48rem", fontFamily:"'JetBrains Mono',monospace", color:th.accent, letterSpacing:"0.06em" }}>
                   {SPORTS_SECTIONS.find(s=>s.id===activeSportsSection)?.short}
                 </span>
               )}
               {cat.id==="business" && activeCategory==="business" && activeBusinessSection !== "business" && (
-                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:activeBusinessSection==="stocks"?"#22c55e":"#f97316", letterSpacing:"0.06em" }}>
+                <span style={{ fontSize:"0.48rem", fontFamily:"'JetBrains Mono',monospace", color:activeBusinessSection==="stocks"?"#22c55e":"#f97316", letterSpacing:"0.06em" }}>
                   {BUSINESS_SECTIONS.find(s=>s.id===activeBusinessSection)?.short}
                 </span>
               )}
               {cat.id==="vibe" && activeCategory==="vibe" && (
-                <span style={{ fontSize:"0.48rem", fontFamily:"'DM Mono',monospace", color:activeVibeSection==="goodnews"?"#22c55e":activeVibeSection==="funny"?"#f59e0b":"#a855f7", letterSpacing:"0.06em" }}>
+                <span style={{ fontSize:"0.48rem", fontFamily:"'JetBrains Mono',monospace", color:activeVibeSection==="goodnews"?"#22c55e":activeVibeSection==="funny"?"#f59e0b":"#a855f7", letterSpacing:"0.06em" }}>
                   {VIBE_SECTIONS.find(s=>s.id===activeVibeSection)?.short}
                 </span>
               )}
-              {cat.id==="saved" && bookmarks.length>0 && <span style={{ background:th.accent, color:night?"#080809":"#fff", fontSize:"0.5rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4 }}>{bookmarks.length}</span>}
-              {cat.id==="live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>●</span>}
-              {cat.id==="vibe" && <span style={{ background:"rgba(34,197,94,0.15)", color:"#22c55e", fontSize:"0.45rem", fontFamily:"'DM Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>✨</span>}
+              {cat.id==="saved" && bookmarks.length>0 && <span style={{ background:th.accent, color:night?"#080809":"#fff", fontSize:"0.5rem", fontFamily:"'JetBrains Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4 }}>{bookmarks.length}</span>}
+              {cat.id==="live" && <span style={{ background:"rgba(239,68,68,0.15)", color:"#ef4444", fontSize:"0.45rem", fontFamily:"'JetBrains Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>●</span>}
+              {cat.id==="vibe" && <span style={{ background:"rgba(34,197,94,0.15)", color:"#22c55e", fontSize:"0.45rem", fontFamily:"'JetBrains Mono',monospace", borderRadius:10, padding:"1px 5px", lineHeight:1.4, letterSpacing:"0.1em" }}>✨</span>}
             </button>
           ))}
           {!isSaved && !isLive && (
-            <button onClick={()=>{ delete cacheRef.current[feedKey]; localStorage.removeItem("theBriefCache_"+feedKey); loadNews(feedKey); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textMuted, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
+            <button onClick={()=>{ delete cacheRef.current[feedKey]; localStorage.removeItem("theBriefCache_"+feedKey); loadNews(feedKey); }} title="Refresh" style={{ marginLeft:"auto", background:"transparent", border:"none", color:th.textMuted, cursor:"pointer", padding:"0.65rem 0.8rem", fontSize:"0.75rem", fontFamily:"'JetBrains Mono',monospace", display:"flex", alignItems:"center", gap:"0.35rem", transition:"color 0.2s", whiteSpace:"nowrap", flexShrink:0 }} onMouseEnter={e=>e.currentTarget.style.color=th.accent} onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
               ↺ <span className="cat-label cat-full" style={{ fontSize:"0.55rem", letterSpacing:"0.12em" }}>REFRESH</span>
             </button>
           )}
@@ -2405,6 +2449,7 @@ const buildMixed = () => {
           maxWidth: 1200,
           margin: "0 auto",
           padding: "1.5rem 1rem 7rem",
+          paddingTop: "var(--header-h, 185px)",
           overflow: "hidden",
           boxSizing: "border-box",
           width: "100%",
@@ -2414,7 +2459,7 @@ const buildMixed = () => {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.25rem", paddingBottom:"0.7rem", borderBottom:`1px solid ${th.borderSub}` }}>
           <div style={{ display:"flex", alignItems:"center", gap:"0.6rem" }}>
             <span style={{ color:isLive?"#ef4444":catAccent, fontSize:"0.85rem" }}>{CATEGORIES.find(c=>c.id===activeCategory)?.icon}</span>
-            <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", fontWeight:700, color:th.textHead, letterSpacing:"-0.01em" }}>
+            <h1 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"clamp(0.9rem,2vw,1.05rem)", fontWeight:700, color:th.textHead, letterSpacing:"-0.01em" }}>
               {isWorld    && activeRegion !== "world" ? currentRegion.label
               : isBusiness && activeBusinessSection !== "business" ? currentBusinessSection.label
               : isSports   && activeSportsSection !== "sports" ? currentSportsSection.label
@@ -2422,26 +2467,26 @@ const buildMixed = () => {
               : isMedia    ? currentMediaSection.label
               : CATEGORIES.find(c=>c.id===activeCategory)?.label}
             </h1>
-            {isMedia && activeMediaSection === "video" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● LIVE</span>}
-            {isMedia && activeMediaSection === "radio" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● ON AIR</span>}
-            {isMedia && activeMediaSection === "podcasts" && <span style={{ background:"rgba(96,165,250,0.1)", color:"#60a5fa", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🎙 AUDIO</span>}
-            {isVibe && activeVibeSection === "goodnews" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😊 GOOD VIBES</span>}
-            {isVibe && activeVibeSection === "funny"    && <span style={{ background:"rgba(245,158,11,0.1)", color:"#f59e0b", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😂 FUNNY</span>}
-            {isVibe && activeVibeSection === "weird"    && <span style={{ background:"rgba(168,85,247,0.1)", color:"#a855f7", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🌀 WEIRD</span>}
-            {isSports && activeSportsSection === "football"   && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>⚽ FOOTBALL</span>}
-            {isSports && activeSportsSection === "nfl"        && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🏈 NFL</span>}
-            {isSports && activeSportsSection === "basketball" && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🏀 BASKETBALL</span>}
-            {isSports && activeSportsSection === "climbing"   && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🧗 CLIMBING</span>}
-            {isBusiness && activeBusinessSection === "stocks" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>📈 MARKETS</span>}
-            {isBusiness && activeBusinessSection === "crypto" && <span style={{ background:"rgba(249,115,22,0.1)", color:"#f97316", fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>₿ CRYPTO</span>}
-            {trendingFilter && <span style={{ background:th.accentBg, color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", padding:"2px 8px", borderRadius:10 }}>◈ {trendingFilter}</span>}
+            {isMedia && activeMediaSection === "video" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● LIVE</span>}
+            {isMedia && activeMediaSection === "radio" && <span style={{ background:"rgba(239,68,68,0.1)", color:"#ef4444", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>● ON AIR</span>}
+            {isMedia && activeMediaSection === "podcasts" && <span style={{ background:"rgba(96,165,250,0.1)", color:"#60a5fa", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🎙 AUDIO</span>}
+            {isVibe && activeVibeSection === "goodnews" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😊 GOOD VIBES</span>}
+            {isVibe && activeVibeSection === "funny"    && <span style={{ background:"rgba(245,158,11,0.1)", color:"#f59e0b", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>😂 FUNNY</span>}
+            {isVibe && activeVibeSection === "weird"    && <span style={{ background:"rgba(168,85,247,0.1)", color:"#a855f7", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🌀 WEIRD</span>}
+            {isSports && activeSportsSection === "football"   && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>⚽ FOOTBALL</span>}
+            {isSports && activeSportsSection === "nfl"        && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🏈 NFL</span>}
+            {isSports && activeSportsSection === "basketball" && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🏀 BASKETBALL</span>}
+            {isSports && activeSportsSection === "climbing"   && <span style={{ background:"rgba(245,197,80,0.1)", color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>🧗 CLIMBING</span>}
+            {isBusiness && activeBusinessSection === "stocks" && <span style={{ background:"rgba(34,197,94,0.1)", color:"#22c55e", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>📈 MARKETS</span>}
+            {isBusiness && activeBusinessSection === "crypto" && <span style={{ background:"rgba(249,115,22,0.1)", color:"#f97316", fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", padding:"2px 8px", borderRadius:10 }}>₿ CRYPTO</span>}
+            {trendingFilter && <span style={{ background:th.accentBg, color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", padding:"2px 8px", borderRadius:10 }}>◈ {trendingFilter}</span>}
             {!isSaved && !isLive && !loading && (filteredArticles.length+filteredVideos.length)>0 && (
-              <span style={{ color:th.accent, fontSize:"0.55rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", opacity:0.8 }}>
+              <span style={{ color:th.accent, fontSize:"0.55rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", opacity:0.8 }}>
                 {filteredArticles.length} stories{filteredVideos.length>0?` · ${filteredVideos.length} videos`:""}
               </span>
             )}
           </div>
-          {(search || trendingFilter) && <button onClick={()=>{setSearch("");setTrendingFilter(null);}} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"3px 9px", borderRadius:3, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace" }}>CLEAR ✕</button>}
+          {(search || trendingFilter) && <button onClick={()=>{setSearch("");setTrendingFilter(null);}} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"3px 9px", borderRadius:3, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace" }}>CLEAR ✕</button>}
         </div>
 
         {/* Nord Privacy Strip */}
@@ -2454,8 +2499,8 @@ const buildMixed = () => {
 
         {!isSaved && !isLive && error && (
           <div style={{ background:"rgba(239,68,68,0.06)", border:"1px solid rgba(239,68,68,0.18)", borderRadius:5, padding:"2rem", textAlign:"center" }}>
-            <p style={{ color:"#f87171", fontFamily:"'DM Mono',monospace", fontSize:"0.75rem", letterSpacing:"0.08em", marginBottom:"1rem" }}>⚠ {error}</p>
-            <button onClick={()=>{ delete cacheRef.current[feedKey]; loadNews(feedKey); }} style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#f87171", cursor:"pointer", padding:"6px 16px", borderRadius:3, fontFamily:"'DM Mono',monospace", fontSize:"0.66rem" }}>↺ RETRY</button>
+            <p style={{ color:"#f87171", fontFamily:"'JetBrains Mono',monospace", fontSize:"0.75rem", letterSpacing:"0.08em", marginBottom:"1rem" }}>⚠ {error}</p>
+            <button onClick={()=>{ delete cacheRef.current[feedKey]; loadNews(feedKey); }} style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", color:"#f87171", cursor:"pointer", padding:"6px 16px", borderRadius:3, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.66rem" }}>↺ RETRY</button>
           </div>
         )}
 
@@ -2467,7 +2512,7 @@ const buildMixed = () => {
         )}
 
         {!isSaved && !isLive && !loading && !error && filteredArticles.length===0 && filteredVideos.length===0 && (search||trendingFilter) && (
-          <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'DM Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em" }}>
+          <div style={{ textAlign:"center", padding:"4rem 1rem", color:th.textFaint, fontFamily:"'JetBrains Mono',monospace", fontSize:"0.72rem", letterSpacing:"0.12em" }}>
             NO CONTENT MATCHING "{(search||trendingFilter||"").toUpperCase()}"
           </div>
         )}
@@ -2488,8 +2533,8 @@ const buildMixed = () => {
       <section style={{ borderTop:`1px solid ${th.borderSub}`, padding:"2.5rem 1rem", transition:"background 0.3s" }}>
         <div style={{ maxWidth:1200, margin:"0 auto" }}>
           <div style={{ marginBottom:"2rem", textAlign:"center" }}>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:700, color:th.textHead, marginBottom:"0.75rem" }}>About The Brief</h2>
-            <p style={{ color:th.textBody, fontSize:"0.82rem", fontFamily:"'Lora',serif", lineHeight:1.8, maxWidth:680, margin:"0 auto" }}>
+            <h2 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"1.1rem", fontWeight:700, color:th.textHead, marginBottom:"0.75rem" }}>About The Brief</h2>
+            <p style={{ color:th.textBody, fontSize:"0.82rem", fontFamily:"'Source Serif 4',serif", lineHeight:1.8, maxWidth:680, margin:"0 auto" }}>
               The Brief is a free live news aggregator pulling breaking stories from BBC News, Reuters, Al Jazeera, TechCrunch, New York Times, Sky News, Wired and Ars Technica. Now with live video news from YouTube. No account required, no paywalls, no autoplay ads. Just clean, fast, live news and video — updated continuously.
             </p>
           </div>
@@ -2509,19 +2554,19 @@ const buildMixed = () => {
               { title:"Political Bias Ratings", desc:"Every source rated by AllSides. Blue = Left. Grey = Centre. Red = Right. Hover any dot to see the rating." },
             ].map(cat=>(
               <div key={cat.title} style={{ padding:"1rem", background:th.bgCard, border:`1px solid ${th.border}`, borderRadius:6 }}>
-                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.4rem" }}>{cat.title}</h3>
-                <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.65 }}>{cat.desc}</p>
+                <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.4rem" }}>{cat.title}</h3>
+                <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Source Serif 4',serif", lineHeight:1.65 }}>{cat.desc}</p>
               </div>
             ))}
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap:"1.5rem" }}>
             <div>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>News Sources</h3>
-              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>BBC News · Reuters · Al Jazeera · TechCrunch · New York Times · Sky News · Wired · Ars Technica · New Scientist · Euronews · DW News · NPR · Autocar · Top Gear · Car and Driver · Motorcycle Daily · RideApart · FortNine · RevZilla</p>
+              <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>News Sources</h3>
+              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Source Serif 4',serif", lineHeight:1.8 }}>BBC News · Reuters · Al Jazeera · TechCrunch · New York Times · Sky News · Wired · Ars Technica · New Scientist · Euronews · DW News · NPR · Autocar · Top Gear · Car and Driver · Motorcycle Daily · RideApart · FortNine · RevZilla</p>
             </div>
             <div>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>Features</h3>
-              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Lora',serif", lineHeight:1.8 }}>Free news aggregator · Live video news · World regional editions · Trending topics · Political bias ratings · No account required · In-app article reader · Breaking news alerts · Weather by location · Save articles · Share to WhatsApp · Night and day mode · Mobile friendly · No tracking</p>
+              <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"0.5rem" }}>Features</h3>
+              <p style={{ color:th.textBody, fontSize:"0.75rem", fontFamily:"'Source Serif 4',serif", lineHeight:1.8 }}>Free news aggregator · Live video news · World regional editions · Trending topics · Political bias ratings · No account required · In-app article reader · Breaking news alerts · Weather by location · Save articles · Share to WhatsApp · Night and day mode · Mobile friendly · No tracking</p>
             </div>
           </div>
         </div>
@@ -2530,7 +2575,7 @@ const buildMixed = () => {
       {/* ── BIAS LEGEND ── */}
       <div style={{ borderTop:`1px solid ${th.borderSub}`, padding:"1.5rem 1rem" }}>
         <div style={{ maxWidth:1200, margin:"0 auto" }}>
-          <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"1rem" }}>Political Bias Ratings</h3>
+          <h3 style={{ fontFamily:"'Instrument Serif',serif", fontSize:"0.88rem", fontWeight:700, color:th.textHead, marginBottom:"1rem" }}>Political Bias Ratings</h3>
           <div style={{ display:"flex", flexWrap:"wrap", gap:"1rem", marginBottom:"0.75rem" }}>
             {[
               { color:"#3b82f6", label:"Left",       desc:"Strongly left-leaning" },
@@ -2541,12 +2586,12 @@ const buildMixed = () => {
             ].map(b=>(
               <div key={b.label} style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
                 <div style={{ width:10, height:10, borderRadius:"50%", background:b.color, flexShrink:0 }} />
-                <span style={{ color:th.textHead, fontSize:"0.72rem", fontFamily:"'DM Mono',monospace" }}>{b.label}</span>
-                <span style={{ color:th.textMuted, fontSize:"0.65rem", fontFamily:"'Lora',serif" }}>— {b.desc}</span>
+                <span style={{ color:th.textHead, fontSize:"0.72rem", fontFamily:"'JetBrains Mono',monospace" }}>{b.label}</span>
+                <span style={{ color:th.textMuted, fontSize:"0.65rem", fontFamily:"'Source Serif 4',serif" }}>— {b.desc}</span>
               </div>
             ))}
           </div>
-          <p style={{ color:th.textFaint, fontSize:"0.65rem", fontFamily:"'DM Mono',monospace" }}>
+          <p style={{ color:th.textFaint, fontSize:"0.65rem", fontFamily:"'JetBrains Mono',monospace" }}>
             Ratings from <a href="https://www.allsides.com" target="_blank" rel="noopener noreferrer" style={{ color:th.accent, textDecoration:"none" }}>AllSides.com</a> — independent non-partisan media bias resource.
           </p>
         </div>
@@ -2570,18 +2615,18 @@ const buildMixed = () => {
               ☕ Support this project
             </a>
           </div>
-          <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Playfair Display',serif", fontWeight:600 }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
-          <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
+          <p style={{ color:th.footer, fontSize:"0.62rem", fontFamily:"'Instrument Serif',serif", fontWeight:600 }}>© {new Date().getFullYear()} Pedro Esteves. All rights reserved.</p>
+          <p style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.14em" }}>THE BRIEF · LIVE NEWS + VIDEO AGGREGATOR · RSS-POWERED</p>
           <a href="https://go.nordvpn.net/aff_c?offer_id=15&aff_id=145666&url_id=902" target="_blank" rel="noopener noreferrer sponsored"
             style={{ display:"inline-flex", alignItems:"center", gap:"0.4rem", textDecoration:"none", opacity:0.6, transition:"opacity 0.2s" }}
             onMouseEnter={e=>e.currentTarget.style.opacity="1"}
             onMouseLeave={e=>e.currentTarget.style.opacity="0.6"}>
-            <span style={{ color:"#64748b", fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em" }}>🔒 Read securely. Stay private online.</span>
-            <span style={{ color:"#4687d6", fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ NordVPN</span>
+            <span style={{ color:"#64748b", fontSize:"0.52rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em" }}>🔒 Read securely. Stay private online.</span>
+            <span style={{ color:"#4687d6", fontSize:"0.52rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.1em", fontWeight:700 }}>→ NordVPN</span>
           </a>
           <div style={{ display:"flex", gap:"1.5rem", flexWrap:"wrap", justifyContent:"center" }}>
             {[["About", "/about.html"], ["Contact", "/contact.html"], ["Privacy Policy", "/privacy.html"]].map(([label, href]) => (
-              <a key={href} href={href} style={{ color:th.textFaint, fontSize:"0.52rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", textDecoration:"none", textTransform:"uppercase", transition:"color 0.2s" }}
+              <a key={href} href={href} style={{ color:th.textFaint, fontSize:"0.68rem", fontFamily:"'JetBrains Mono',monospace", letterSpacing:"0.12em", textDecoration:"none", textTransform:"uppercase", fontWeight:700, transition:"color 0.2s" }}
                 onMouseEnter={e=>e.currentTarget.style.color=th.accent}
                 onMouseLeave={e=>e.currentTarget.style.color=th.textFaint}>
                 {label}
@@ -2601,10 +2646,10 @@ const buildMixed = () => {
               value={search}
               onChange={e=>setSearch(e.target.value)}
               placeholder="Search stories..."
-              style={{ flex:1, background:"transparent", border:"none", outline:"none", color:th.text, fontSize:"16px", fontFamily:"'DM Mono',monospace" }}
+              style={{ flex:1, background:"transparent", border:"none", outline:"none", color:th.text, fontSize:"16px", fontFamily:"'JetBrains Mono',monospace" }}
             />
             {search && <button onClick={()=>setSearch("")} style={{ background:"transparent", border:"none", color:th.textMuted, cursor:"pointer", fontSize:"1rem" }}>✕</button>}
-            <button onClick={()=>{ setShowMobileSearch(false); }} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"4px 10px", borderRadius:4, fontSize:"0.6rem", fontFamily:"'DM Mono',monospace" }}>DONE</button>
+            <button onClick={()=>{ setShowMobileSearch(false); }} style={{ background:"transparent", border:`1px solid ${th.border}`, color:th.textMuted, cursor:"pointer", padding:"4px 10px", borderRadius:4, fontSize:"0.6rem", fontFamily:"'JetBrains Mono',monospace" }}>DONE</button>
           </div>
           <div style={{ flex:1, background:"rgba(0,0,0,0.5)" }} />
         </div>
